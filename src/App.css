@@ -1,1 +1,7 @@
+/* main{
+  color:rgb(41, 19, 52)
+} */
 
+main {
+  min-height: calc(100vh - 80px - 224px);
+}
