@@ -1,11 +1,18 @@
 import { signOut } from "firebase/auth";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { auth } from "../firebaseAuth";
 import { useAuthState, useSignOut } from "react-firebase-hooks/auth";
+import { useEffect } from "react";
+import cx from "clsx";
 
 export default function Header() {
   const [isLogin] = useAuthState(auth);
   const [signOut, loading, error] = useSignOut(auth);
+  const isOnline = !!isLogin;
+
+  console.log(isLogin);
+  //isLogin에 user인증정보 다 들어있다.
+  //로그인상태는 daisy아바타
 
   const handleSignOut = async () => {
     await signOut();
@@ -15,11 +22,30 @@ export default function Header() {
   };
 
   return (
-    <header className="h-28 p-5 bg-base-200">
-      <div>{isLogin ? "로그인상태" : "로그아웃상태 "}</div>
+    <header className="h-32 p-5 bg-base-200/80">
       <div className="container mx-auto ">
-        <h1 className="w-52 text-3xl font-mono font-black text-center mx-auto">
-          <Link to={"/"}>
+        <div className="w-16 ml-auto ">
+          <div
+            className={cx(
+              "avatar",
+              { ["offline"]: !isOnline },
+              { ["online"]: isOnline }
+            )}
+          >
+            <div className="w-10 rounded-full bg-base-100 text-primary shadow">
+              <svg
+                className="w-14 mt-1"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 22 22"
+              >
+                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <h1 className="w-52 text-3xl font-black text-center mx-auto -mt-4 ">
+          <Link to={"/"} className="flex justify-center items-center">
             <svg
               className="w-10 h-10 inline-block px-2"
               version="1.0"
@@ -57,12 +83,12 @@ export default function Header() {
             JAVA TIME
           </Link>
         </h1>
-        <div className="w-36 ml-auto flex justify-center">
+        <div className="w-40 ml-auto flex justify-center">
           {isLogin ? (
             <>
               <button
                 onClick={handleSignOut}
-                className="link link-hover inline-block p-1 text-sm font-semibold"
+                className=" inline-block mr-2 p-2 text-sm font-semibold hover:bg-base-100/60 transition-colors rounded-lg"
               >
                 로그아웃
               </button>
@@ -71,13 +97,13 @@ export default function Header() {
             <>
               <Link
                 to={"/login"}
-                className="link link-hover inline-block mr-2 p-1 text-sm font-semibold"
+                className=" inline-block  p-2 text-sm font-semibold hover:bg-base-100/60 transition-colors rounded-lg"
               >
                 로그인
               </Link>
               <Link
                 to={"/join"}
-                className="link link-hover inline-block p-1 text-sm font-semibold"
+                className=" inline-block p-2 text-sm font-semibold hover:bg-base-100/60 transition-colors rounded-lg"
               >
                 회원가입
               </Link>

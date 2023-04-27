@@ -1,11 +1,11 @@
-import { atom, selector } from "recoil";
+// import { atom, selector } from "recoil";
 
-const loginID = atom({
-  key: "loginID",
-  default: null,
-});
+// const loginID = atom({
+//   key: "loginID",
+//   default: null,
+// });
 
-export const loginState = selector({
-  key: "loginState",
-  get: ({ get }) => !!get(loginID),
-});
+// export const loginState = selector({
+//   key: "loginState",
+//   get: ({ get }) => !!get(loginID),
+// });

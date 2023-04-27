@@ -48,7 +48,6 @@ export default function Join() {
     e.preventDefault();
     const res = await createUserWithEmailAndPassword(email, password);
     return res;
-    //로그인페이지로 가야하나?
   };
 
   // const handleRegisterSubmit = async (e: React.FormEvent) => {
@@ -87,35 +86,52 @@ export default function Join() {
 
   return (
     <main className="py-20">
-      <div className=" mx-auto w-[400px] text-center">
+      <div className=" mx-auto w-[600px] p-10 text-center rounded-lg border border-base-200 shadow-md">
         <form onSubmit={handleRegisterSubmit}>
           <fieldset className="">
-            <legend>회원가입</legend>
-            <label className="block">
-              E-Mail{" "}
+            <legend className="flex justify-center items-center w-32 h-10  -translate-y-16 font-semibold rounded-full shadow bg-base-100">
+              회원가입
+            </legend>
+            <div className="flex justify-center items-center">
+              <label
+                htmlFor="registeredEmail"
+                className="block w-24 text-left font-semibold text-sm"
+              >
+                E-MAIL{" "}
+              </label>
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 ref={emailRef}
                 type="email"
+                id="registeredEmail"
                 name="email"
+                placeholder="example@example.com"
                 className="placeholder:text-sm input w-full max-w-xs input-bordered rounded-lg mb-2 shadow"
-                autoFocus
               />
-            </label>
-            <label className="block">
-              password{" "}
+            </div>
+            <div className="flex justify-center items-center">
+              <label
+                htmlFor="registeredPW"
+                className="block w-24 text-left font-semibold text-sm"
+              >
+                PASSWORD{" "}
+              </label>
               <input
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 ref={passwordRef}
                 type="password"
                 name="password"
+                id="registeredPW"
+                placeholder="비밀번호는 6자 이상으로 만들어주세요."
                 className="placeholder:text-sm input w-full max-w-xs input-bordered rounded-lg mb-2 shadow"
               />
-            </label>
+            </div>
             <p className="text-error text-right text-xs h-5">{errorMsg}</p>
-            <button className="btn">가입하기</button>
+            <button className="btn  rounded-lg shadow-md no-animation my-8">
+              가입하기
+            </button>
           </fieldset>
         </form>
       </div>

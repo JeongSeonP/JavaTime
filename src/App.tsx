@@ -4,7 +4,7 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Join from "./components/Join";
 import Login from "./components/Login";
-import Home from "./Home";
+import Home from "./pages/Home";
 import { RecoilRoot } from "recoil";
 
 function App() {
