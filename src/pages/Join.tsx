@@ -1,9 +1,9 @@
-import { auth } from "../firebaseAuth";
+import { auth } from "../firebase";
 import { useEffect, useRef, useState } from "react";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
 
-export default function Join() {
+const Join = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -49,50 +49,16 @@ export default function Join() {
     const res = await createUserWithEmailAndPassword(email, password);
     return res;
   };
-
-  // const handleRegisterSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   try {
-  //     const { user } = await createUserWithEmailAndPassword(
-  //       auth,
-  //       email,
-  //       password
-  //     );
-  //     //로그인페이지로 가야하나?
-  //   } catch (err) {
-  //     if (err instanceof FirebaseError) {
-  //       switch (err.code) {
-  //         case "auth/email-already-in-use":
-  //           setErrorMsg("이미 가입된 email주소입니다.");
-  //           setEmail("");
-  //           setPassword("");
-  //           emailRef.current?.focus();
-  //           break;
-  //         case "auth/invalid-email":
-  //           setErrorMsg("잘못된 email주소입니다.");
-  //           setEmail("");
-  //           setPassword("");
-  //           emailRef.current?.focus();
-  //           break;
-  //         case "auth/weak-password":
-  //           setErrorMsg("password는 최소 6자 이상이어야 합니다.");
-  //           setPassword("");
-  //           passwordRef.current?.focus();
-  //           break;
-  //       }
-  //     }
-  //   }
-  // };
-
+  //반응형 보드 조정 필요(FormBoard적용)
   return (
     <main className="py-20">
-      <div className=" mx-auto w-[600px] p-10 text-center rounded-lg border border-base-200 shadow-md">
+      <article className=" mx-auto w-[600px] p-10 text-center rounded-3xl border border-base-200 shadow">
         <form onSubmit={handleRegisterSubmit}>
-          <fieldset className="">
-            <legend className="flex justify-center items-center w-32 h-10  -translate-y-16 font-semibold rounded-full shadow bg-base-100">
+          <fieldset className="text-neutral-600">
+            <legend className="flex justify-center items-center px-10 h-10  -translate-y-16 font-semibold rounded-full shadow bg-base-100">
               회원가입
             </legend>
-            <div className="flex justify-center items-center">
+            <div className="flex justify-center items-center mb-2">
               <label
                 htmlFor="registeredEmail"
                 className="block w-24 text-left font-semibold text-sm"
@@ -107,10 +73,10 @@ export default function Join() {
                 id="registeredEmail"
                 name="email"
                 placeholder="example@example.com"
-                className="placeholder:text-sm input w-full max-w-xs input-bordered rounded-lg mb-2 shadow"
+                className="placeholder:text-sm input w-full max-w-xs input-bordered input-primary rounded-lg  "
               />
             </div>
-            <div className="flex justify-center items-center">
+            <div className="flex justify-center items-center mb-2">
               <label
                 htmlFor="registeredPW"
                 className="block w-24 text-left font-semibold text-sm"
@@ -125,16 +91,17 @@ export default function Join() {
                 name="password"
                 id="registeredPW"
                 placeholder="비밀번호는 6자 이상으로 만들어주세요."
-                className="placeholder:text-sm input w-full max-w-xs input-bordered rounded-lg mb-2 shadow"
+                className="placeholder:text-sm input w-full max-w-xs input-bordered input-primary rounded-lg "
               />
             </div>
             <p className="text-error text-right text-xs h-5">{errorMsg}</p>
-            <button className="btn  rounded-lg shadow-md no-animation my-8">
+            <button className="btn btn-wide rounded-full shadow-md no-animation my-8">
               가입하기
             </button>
           </fieldset>
         </form>
-      </div>
+      </article>
     </main>
   );
-}
+};
+export default Join;

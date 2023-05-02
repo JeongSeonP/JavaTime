@@ -1,63 +1,24 @@
-import { signOut } from "firebase/auth";
-import { Link, Navigate } from "react-router-dom";
-import { auth } from "../firebaseAuth";
-import { useAuthState, useSignOut } from "react-firebase-hooks/auth";
-import { useEffect } from "react";
-import cx from "clsx";
+import { Link } from "react-router-dom";
+import MyMenu from "./MyMenu";
 
-export default function Header() {
-  const [isLogin] = useAuthState(auth);
-  const [signOut, loading, error] = useSignOut(auth);
-  const isOnline = !!isLogin;
-
-  console.log(isLogin);
-  //isLogin에 user인증정보 다 들어있다.
-  //로그인상태는 daisy아바타
-
-  const handleSignOut = async () => {
-    await signOut();
-    if (error) {
-      throw new Error("로그아웃실패");
-    }
-  };
-
+const Header = () => {
   return (
-    <header className="h-32 p-5 bg-base-200/80">
-      <div className="container mx-auto ">
-        <div className="w-16 ml-auto ">
-          <div
-            className={cx(
-              "avatar",
-              { ["offline"]: !isOnline },
-              { ["online"]: isOnline }
-            )}
-          >
-            <div className="w-10 rounded-full bg-base-100 text-primary shadow">
-              <svg
-                className="w-14 mt-1"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 22 22"
-              >
-                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-        <h1 className="w-52 text-3xl font-black text-center mx-auto -mt-4 ">
+    <header className="h-24 p-5 bg-base-200/80">
+      <div className="container mx-auto flex justify-between items-center">
+        <h1 className="w-52 text-3xl font-black text-center ">
           <Link to={"/"} className="flex justify-center items-center">
             <svg
-              className="w-10 h-10 inline-block px-2"
+              className="w-10 h-10 inline-block px-2 "
               version="1.0"
               xmlns="http://www.w3.org/2000/svg"
               width="124.000000pt"
               height="120.000000pt"
               viewBox="0 0 124.000000 120.000000"
               preserveAspectRatio="xMidYMid meet"
+              fill="currentColor"
             >
               <g
                 transform="translate(0.000000,120.000000) scale(0.100000,-0.100000)"
-                fill="#000000"
                 stroke="none"
               >
                 <path
@@ -83,34 +44,10 @@ export default function Header() {
             JAVA TIME
           </Link>
         </h1>
-        <div className="w-40 ml-auto flex justify-center">
-          {isLogin ? (
-            <>
-              <button
-                onClick={handleSignOut}
-                className=" inline-block mr-2 p-2 text-sm font-semibold hover:bg-base-100/60 transition-colors rounded-lg"
-              >
-                로그아웃
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                to={"/login"}
-                className=" inline-block  p-2 text-sm font-semibold hover:bg-base-100/60 transition-colors rounded-lg"
-              >
-                로그인
-              </Link>
-              <Link
-                to={"/join"}
-                className=" inline-block p-2 text-sm font-semibold hover:bg-base-100/60 transition-colors rounded-lg"
-              >
-                회원가입
-              </Link>
-            </>
-          )}
-        </div>
+        <MyMenu />
       </div>
     </header>
   );
-}
+};
+
+export default Header;

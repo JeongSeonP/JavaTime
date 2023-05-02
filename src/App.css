@@ -3,5 +3,6 @@
 } */
 
 main {
-  min-height: calc(100vh - 80px - 224px);
+  min-height: calc(100vh - 96px - 224px);
+  color: #52453a;
 }

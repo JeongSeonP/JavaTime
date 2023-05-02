@@ -1,12 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
-import { auth } from "../firebaseAuth";
+import { auth } from "../firebase";
 import { useEffect, useRef, useState } from "react";
 import {
   useSignInWithEmailAndPassword,
   useSignInWithGoogle,
 } from "react-firebase-hooks/auth";
 
-export default function Login() {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -75,7 +75,7 @@ export default function Login() {
 
   return (
     <main className="py-20">
-      <div className="w-80 mx-auto text-center">
+      <article className="w-80 mx-auto text-center">
         <form onSubmit={handleLoginSubmit}>
           <input
             value={email}
@@ -84,7 +84,7 @@ export default function Login() {
             type="email"
             name="email"
             placeholder="E-MAIL"
-            className="placeholder:text-sm input w-full max-w-xs input-bordered rounded-lg mb-2 shadow"
+            className="placeholder:text-sm input w-full max-w-xs input-bordered input-primary rounded-[15px] mb-2 "
           />
           <input
             value={password}
@@ -93,20 +93,20 @@ export default function Login() {
             type="password"
             name="password"
             placeholder="PASSWORD"
-            className="placeholder:text-sm input w-full max-w-xs input-bordered rounded-lg mb-2 shadow"
+            className="placeholder:text-sm input w-full max-w-xs input-bordered input-primary rounded-[15px] mb-2 "
           />
           <p className="text-error text-right text-xs h-5">{errorMsg}</p>
-          <button className="btn btn-ghost bg-neutral/90 hover:bg-neutral text-neutral-content w-full rounded-lg shadow-md no-animation my-2">
+          <button className="btn  bg-neutral/90 hover:bg-neutral text-neutral-content w-full rounded-full shadow-md no-animation my-2">
             로그인
           </button>
         </form>
         <button
           onClick={handleGGLogin}
-          className="btn  w-full rounded-lg shadow-md no-animation my-2"
+          className="btn  w-full rounded-full shadow-md no-animation my-2"
         >
           <svg
             className="w-4 mr-2"
-            enable-background="new 0 0 512 512"
+            enableBackground="new 0 0 512 512"
             id="Layer_1"
             version="1.1"
             viewBox="0 0 512 512"
@@ -135,7 +135,9 @@ export default function Login() {
           </svg>
           구글 로그인
         </button>
-      </div>
+      </article>
     </main>
   );
-}
+};
+
+export default Login;

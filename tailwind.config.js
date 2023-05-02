@@ -6,8 +6,14 @@ export default {
     colors: {},
     extend: {
       colors: {
-        "base-color": "efeae6",
+        "base-color": "#efeae6",
+        "base-dark-color": "#52453a",
       },
+    },
+    screens: {
+      sm: "480px",
+      md: "768px",
+      lg: "1025px",
     },
   },
   plugins: [daisyui],
@@ -17,7 +23,7 @@ export default {
       "cupcake",
       {
         mytheme: {
-          base: "efeae6",
+          base: "#efeae6",
         },
       },
     ],

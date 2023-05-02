@@ -1,4 +1,4 @@
-export default function Footer() {
+const Footer = () => {
   return (
     <footer className="footer footer-center p-10 bg-base-200/80 text-base-content rounded">
       <div className="grid grid-flow-col gap-4">
@@ -59,4 +59,6 @@ export default function Footer() {
       </div>
     </footer>
   );
-}
+};
+
+export default Footer;
