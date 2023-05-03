@@ -49,7 +49,7 @@ const Join = () => {
     const res = await createUserWithEmailAndPassword(email, password);
     return res;
   };
-  //반응형 보드 조정 필요(FormBoard적용)
+  //조정 필요(FormBoard적용)
   return (
     <main className="py-20">
       <article className=" mx-auto w-[600px] p-10 text-center rounded-3xl border border-base-200 shadow">
