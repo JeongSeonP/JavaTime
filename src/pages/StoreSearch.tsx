@@ -42,7 +42,6 @@ const StoreSearch = () => {
     );
     console.log(selectedStore);
     //이후에 그중에서 선택된 업체에 대해 x,y좌표 뽑아서 getStation호출해야함
-    // const station = getStation(placeInfo.x, placeInfo.y);
   }, [selectedID]);
 
   return (
