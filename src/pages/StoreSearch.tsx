@@ -1,48 +1,86 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Board from "../components/Board";
 import SearchBar from "../components/SearchBar";
-import StoreList from "../components/StoreList";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import SearchedStores from "../components/SearchedStores";
+import { getSearchedStoreInfo } from "../kakaoAPI";
+import cx from "clsx";
 
 interface StoreProps {
   id: string;
   place_name: string;
   road_address_name: string;
+  x: string;
+  y: string;
 }
 
 const StoreSearch = () => {
   const [searchInput, setSearchInput] = useState("");
   const [searchedList, setSearchedLIst] = useState<StoreProps[]>([]);
-  const [selectedID, setSelectedID] = useState("");
+  const [page, setPage] = useState("");
+  const [lastPage, setLastPage] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [noResult, setNoResult] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setPage("1");
+    getPage();
+  };
 
-    const getSearchedStoreInfo = async (storeName: string) => {
-      const { data } = await axios.get(
-        `https://dapi.kakao.com/v2/local/search/keyword.json?category_group_code=CE7&query=${storeName}`,
-        {
-          headers: {
-            Authorization: `KakaoAK ${import.meta.env.VITE_KAKAO_REST_API_KEY}`,
-          },
-        }
-      );
+  const handlePage = async () => {
+    setIsLoading(true);
+    setPage((page) => String(Number(page) + 1));
+  };
 
-      const placeInfo = data.documents;
-      setSearchedLIst(placeInfo);
-    };
-    getSearchedStoreInfo(searchInput);
+  const getSelectedStore = (selectedID: string) => {
+    const store: StoreProps | undefined = searchedList.find(
+      (store) => store.id === selectedID
+    );
+    if (store) {
+      const selectedStore = {
+        id: store.id,
+        storeName: store.place_name,
+        address: store.road_address_name,
+        x: store.x,
+        y: store.y,
+      };
+      sessionStorage.setItem("selectedStore", JSON.stringify(selectedStore));
+    }
+  };
+
+  const getPage = async () => {
+    if (searchInput === "" || page === "0") return;
+    const [storeInfos, isEnd] = await getSearchedStoreInfo(searchInput, page);
+
+    if (storeInfos.length === 0) {
+      setNoResult(true);
+      setLastPage(true);
+      setPage("0");
+      setSearchedLIst([]);
+      return;
+    } else {
+      setLastPage(false);
+      setNoResult(false);
+      console.log("anjdi");
+    }
+
+    if (isEnd) {
+      setLastPage(isEnd);
+    }
+    if (page !== "1") {
+      const newStoreList = searchedList.concat(storeInfos);
+      setSearchedLIst(newStoreList);
+    } else {
+      setSearchedLIst(storeInfos);
+    }
   };
 
   useEffect(() => {
-    const [selectedStore] = searchedList.filter(
-      (store) => store.id === selectedID
-    );
-    console.log(selectedStore);
-    //이후에 그중에서 선택된 업체에 대해 x,y좌표 뽑아서 getStation호출해야함
-  }, [selectedID]);
+    getPage();
+    setIsLoading(false);
+  }, [page]);
 
   return (
     <main className="pt-10 pb-20 ">
@@ -57,14 +95,38 @@ const StoreSearch = () => {
             dispatchValue={setSearchInput}
             handler={handleSubmit}
           />
-          <SearchedStores storeList={searchedList} dispatchID={setSelectedID} />
+          {noResult ? (
+            <div className="mt-6">검색결과가 없습니다.</div>
+          ) : (
+            <SearchedStores
+              storeList={searchedList}
+              dispatchID={getSelectedStore}
+            />
+          )}
+          {lastPage ? null : (
+            <button
+              onClick={handlePage}
+              className={cx(
+                "btn btn-ghost w-3/4 bg-base-200 hover:bg-base-300",
+                { ["loading"]: isLoading }
+              )}
+            >
+              더보기
+            </button>
+          )}
         </Board>
         <div className="my-4">
-          <button className="w-28 btn btn-primary bg-primary/50 hover:bg-primary/70 border-none">
-            <Link to={"/review"}>다음단계</Link>
+          <button
+            onClick={() => navigate("/review")}
+            className="w-28 btn btn-primary bg-primary/50 hover:bg-primary/70 border-none"
+          >
+            다음단계
           </button>
-          <button className="w-28 btn btn-active btn-ghost">
-            <Link to={"/"}>취소</Link>
+          <button
+            onClick={() => navigate("/")}
+            className="w-28 btn btn-active btn-ghost"
+          >
+            취소
           </button>
         </div>
       </div>

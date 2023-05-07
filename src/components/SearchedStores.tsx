@@ -1,6 +1,5 @@
-import cx from "clsx";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { Dispatch, SetStateAction } from "react";
+import { useSetRecoilState } from "recoil";
+import { selectedStore } from "../StoreAtom";
 
 interface StoreProps {
   id: string;
@@ -10,9 +9,10 @@ interface StoreProps {
 
 interface Props {
   storeList: StoreProps[];
-  dispatchID: Dispatch<SetStateAction<string>>;
+  dispatchID: (selectedID: string) => void;
 }
 
+//hover시 li 바탕색 바뀌게 하기
 const SearchedStores = ({ storeList, dispatchID }: Props) => {
   return (
     <ul className="max-w-md py-3 mx-auto">
@@ -31,7 +31,7 @@ const SearchedStores = ({ storeList, dispatchID }: Props) => {
                 className="p-1 w-full flex md:justify-between"
               >
                 <div className="w-full  flex flex-col sm:flex-row   justify-start ml-2 truncate">
-                  <p className="mb-2 md:mt-2 text-left shrink-0 w-1/2 md:leading-loose">
+                  <p className="mb-2 md:mt-2 text-left  w-1/2 md:leading-loose whitespace-normal">
                     {store.place_name}
                   </p>
                   <div className="max-w-[200px] flex flex-col md:justify-center">

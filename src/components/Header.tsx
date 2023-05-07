@@ -3,12 +3,15 @@ import MyMenu from "./MyMenu";
 
 const Header = () => {
   return (
-    <header className="h-24 p-5 bg-base-200/80">
+    <header className="h-24 p-5 bg-base-200 fixed top-0 left-0 right-0 z-[9999] shadow">
       <div className="container mx-auto flex justify-between items-center">
-        <h1 className="w-52 text-3xl font-black text-center ">
-          <Link to={"/"} className="flex justify-center items-center">
+        <h1 className="w-52 text-2xl font-black text-center ">
+          <Link
+            to={"/"}
+            className="flex justify-start sm:justify-center items-center"
+          >
             <svg
-              className="w-10 h-10 inline-block px-2 "
+              className="w-12 h-12 sm:w-10 sm:h-10 inline-block px-2 "
               version="1.0"
               xmlns="http://www.w3.org/2000/svg"
               width="124.000000pt"
@@ -41,7 +44,7 @@ const Header = () => {
                 />
               </g>
             </svg>
-            JAVA TIME
+            <span className="sr-only sm:not-sr-only">JAVA TIME</span>
           </Link>
         </h1>
         <MyMenu />

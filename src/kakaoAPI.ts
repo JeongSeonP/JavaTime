@@ -1,4 +1,6 @@
 import axios from "axios";
+import { useEffect } from "react";
+import { useQuery } from "react-query";
 
 //카카오 로컬 테스트
 //리뷰 작성시 기존 데이터 없을때 카카오통해서 업체 검색 -> x,y값기준 근처 지하철역검색결과를 포함한 데이터 생성해서 firestore에 저장
@@ -10,7 +12,7 @@ interface documents {
   place_name: string;
 }
 
-async function getStation(x: string, y: string) {
+export const getStation = async (x: string, y: string) => {
   const { data } = await axios.get(
     `https://dapi.kakao.com/v2/local/search/category.json?category_group_code=SW8&y=${y}&x=${x}&radius=1000`,
     {
@@ -19,25 +21,28 @@ async function getStation(x: string, y: string) {
       },
     }
   );
-  const stationList = data.documents.map((data: documents) => data.place_name);
+  const stationList = data.documents.map((data: documents) =>
+    data.place_name.slice(0, -4)
+  );
   return stationList;
-}
+};
 
-// async function getSearchedStoreInfo(storeName: string) {
-//   const { data } = await axios.get(
-//     `https://dapi.kakao.com/v2/local/search/keyword.json?category_group_code=CE7&query=${storeName}`,
-//     {
-//       headers: {
-//         Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
-//       },
-//     }
-//   );
-//   //업체명으로 검색된 여러 결과들 정보
-//   const placeInfo = data.documents;
-//   return placeInfo;
+export const getSearchedStoreInfo = async (storeName: string, page: string) => {
+  const { data } = await axios.get(
+    `https://dapi.kakao.com/v2/local/search/keyword.json?category_group_code=CE7&query=${storeName}&page=${page}&size=5`,
+    {
+      headers: {
+        Authorization: `KakaoAK ${import.meta.env.VITE_KAKAO_REST_API_KEY}`,
+      },
+    }
+  );
 
-//   //이후에 그중에서 선택된 업체에 대해 x,y좌표 뽑아서 getStation호출해야함
-//   // const station = getStation(placeInfo.x, placeInfo.y);
-// }
-// const location = getSearchedStoreInfo("스트라다");
-// console.log(location);
+  const placeInfo = data.documents;
+  const isEnd = data.meta.is_end;
+
+  return [placeInfo, isEnd];
+};
+
+// export const useStore = (storeName: string, page: string) => {
+//   return useQuery(["storeInfo"], () => getSearchedStoreInfo(storeName, page));
+// };

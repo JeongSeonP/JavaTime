@@ -5,9 +5,7 @@ const Home = () => {
   return (
     <main className="py-5">
       <div className="w-4/5 mx-auto text-center">
-        <section className="form-control py-5">
-          <SearchBar />
-        </section>
+        <section className="form-control py-5">{/* <SearchBar /> */}</section>
         <section>
           <button className="btn btn-primary bg-primary/50 hover:bg-primary/70 border-none">
             <Link to={"/storeselect"} className="flex items-center h-full">

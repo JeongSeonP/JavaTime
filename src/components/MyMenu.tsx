@@ -9,7 +9,7 @@ const MyMenu = () => {
   const [signOut, loading, error] = useSignOut(auth);
   const isOnline = !!isLogin;
 
-  console.log(isLogin);
+  // console.log(isLogin);
   //isLogin에 user인증정보 다 들어있다.
   //로그인상태는 daisy아바타
 
@@ -32,9 +32,9 @@ const MyMenu = () => {
       <div tabIndex={0} className=" dropdown dropdown-end ">
         <label
           className={cx(
-            " btn btn-ghost btn-circle hover:bg-primary/60 avatar",
-            { ["offline"]: !isOnline },
-            { ["online"]: isOnline }
+            " btn btn-ghost btn-circle avatar",
+            { ["offline hover:bg-primary/20"]: !isOnline },
+            { ["online hover:bg-primary/60"]: isOnline }
           )}
         >
           <div className="w-10 rounded-full bg-base-100 text-primary shadow">

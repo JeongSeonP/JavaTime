@@ -1,4 +1,3 @@
-// Import the functions you need from the SDKs you need
 import axios from "axios";
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
@@ -52,10 +51,18 @@ const addStore = async () => {
 };
 // addStore();
 
-const docSnap = await getDocs(storeCollectionRef);
-docSnap.forEach((doc) => {
-  console.log(doc.data());
-});
+const getStore = async () => {
+  try {
+    const docSnap = await getDocs(storeCollectionRef);
+    docSnap.forEach((doc) => {
+      console.log(doc.data());
+    });
+    console.log(docSnap);
+  } catch (e) {
+    throw new Error("Error");
+  }
+};
+// getStore();
 
 //데이터구조
 /**

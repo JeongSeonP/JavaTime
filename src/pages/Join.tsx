@@ -2,6 +2,7 @@ import { auth } from "../firebase";
 import { useEffect, useRef, useState } from "react";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
+import FormBoard from "../components/FormBoard";
 
 const Join = () => {
   const [email, setEmail] = useState("");
@@ -13,6 +14,7 @@ const Join = () => {
   const [createUserWithEmailAndPassword, user, loading, error] =
     useCreateUserWithEmailAndPassword(auth);
 
+  //로그인, 조인 : 커스텀훅으로 해보기?
   useEffect(() => {
     if (user) {
       setEmail("");
@@ -49,10 +51,54 @@ const Join = () => {
     const res = await createUserWithEmailAndPassword(email, password);
     return res;
   };
-  //조정 필요(FormBoard적용)
+
   return (
     <main className="py-20">
-      <article className=" mx-auto w-[600px] p-10 text-center rounded-3xl border border-base-200 shadow">
+      <div className=" mx-auto text-center ">
+        <FormBoard
+          title="회원가입"
+          submitBtn="가입하기"
+          onSubmit={handleRegisterSubmit}
+        >
+          <div className="flex justify-center items-center mb-2">
+            <label
+              htmlFor="registeredEmail"
+              className="block w-24 text-left font-semibold text-xs md:text-sm"
+            >
+              E-MAIL{" "}
+            </label>
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              ref={emailRef}
+              type="email"
+              id="registeredEmail"
+              name="email"
+              placeholder="example@example.com"
+              className="placeholder:text-sm input w-full max-w-xs input-bordered input-primary rounded-lg  "
+            />
+          </div>
+          <div className="flex justify-center items-center mb-2">
+            <label
+              htmlFor="registeredPW"
+              className="block w-24 text-left font-semibold text-xs md:text-sm"
+            >
+              PASSWORD{" "}
+            </label>
+            <input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              ref={passwordRef}
+              type="password"
+              name="password"
+              id="registeredPW"
+              placeholder="비밀번호는 6자 이상으로 만들어주세요."
+              className="placeholder:text-sm input w-full max-w-xs input-bordered input-primary rounded-lg "
+            />
+          </div>
+          <p className="text-error text-right text-xs h-5">{errorMsg}</p>
+        </FormBoard>
+        {/* <article className=" mx-auto w-[600px] p-10 text-center rounded-3xl border border-base-200 shadow">
         <form onSubmit={handleRegisterSubmit}>
           <fieldset className="text-neutral-600">
             <legend className="flex justify-center items-center px-10 h-10  -translate-y-16 font-semibold rounded-full shadow bg-base-100">
@@ -100,7 +146,8 @@ const Join = () => {
             </button>
           </fieldset>
         </form>
-      </article>
+      </article> */}
+      </div>
     </main>
   );
 };
