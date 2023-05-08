@@ -4,11 +4,13 @@ import SearchBar from "../components/SearchBar";
 import { useEffect, useState } from "react";
 import SearchedStores from "../components/SearchedStores";
 import { getSearchedStoreInfo } from "../kakaoAPI";
+import Modal from "../components/Modal";
 import cx from "clsx";
 
 interface StoreProps {
   id: string;
   place_name: string;
+  phone: string;
   road_address_name: string;
   x: string;
   y: string;
@@ -21,10 +23,18 @@ const StoreSearch = () => {
   const [lastPage, setLastPage] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [noResult, setNoResult] = useState(false);
+  const [isSelected, setisSelected] = useState(false);
+  const [modal, setModal] = useState(false);
   const navigate = useNavigate();
+  const modalOption = {
+    h3: "선택된 카페가 없습니다. 카페를 선택해주세요.",
+    p: "카페선택을 계속하시려면 확인버튼을 눌러주세요.",
+    button: "확인",
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSearchedLIst([]);
     setPage("1");
     getPage();
   };
@@ -41,12 +51,14 @@ const StoreSearch = () => {
     if (store) {
       const selectedStore = {
         id: store.id,
+        phone: store.phone,
         storeName: store.place_name,
         address: store.road_address_name,
         x: store.x,
         y: store.y,
       };
       sessionStorage.setItem("selectedStore", JSON.stringify(selectedStore));
+      setisSelected(true);
     }
   };
 
@@ -63,7 +75,6 @@ const StoreSearch = () => {
     } else {
       setLastPage(false);
       setNoResult(false);
-      console.log("anjdi");
     }
 
     if (isEnd) {
@@ -75,6 +86,19 @@ const StoreSearch = () => {
     } else {
       setSearchedLIst(storeInfos);
     }
+  };
+
+  const handleNextStep = () => {
+    if (isSelected) {
+      navigate("/review");
+      setisSelected(false);
+    } else {
+      setModal(true);
+    }
+  };
+
+  const handleRedirect = () => {
+    setModal(false);
   };
 
   useEffect(() => {
@@ -117,7 +141,7 @@ const StoreSearch = () => {
         </Board>
         <div className="my-4">
           <button
-            onClick={() => navigate("/review")}
+            onClick={handleNextStep}
             className="w-28 btn btn-primary bg-primary/50 hover:bg-primary/70 border-none"
           >
             다음단계
@@ -130,6 +154,11 @@ const StoreSearch = () => {
           </button>
         </div>
       </div>
+      <Modal
+        toggle={modal}
+        handleRedirect={handleRedirect}
+        option={modalOption}
+      />
     </main>
   );
 };

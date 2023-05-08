@@ -4,10 +4,14 @@ import { getAuth } from "firebase/auth";
 import {
   QuerySnapshot,
   addDoc,
+  doc,
+  setDoc,
+  getDoc,
   collection,
   getDocs,
   getFirestore,
   query,
+  serverTimestamp,
 } from "firebase/firestore";
 
 // import { getAnalytics } from "firebase/analytics";
@@ -36,22 +40,59 @@ export const db = getFirestore(app);
 // console.log(currentUser);
 
 //firestore 생성 테스트
+
+interface StoreDoc {
+  id: string;
+  phone: string;
+  storeName: string;
+  address: string;
+  stationList: string[];
+  //review: Object;
+}
+
+interface ReviewDoc {
+  id: string;
+  review: Object;
+}
+
 const storeCollectionRef = collection(db, "stores");
 
-const addStore = async () => {
+export const addStore = async (doc: StoreDoc) => {
   try {
-    const res = await addDoc(storeCollectionRef, {
-      name: "결",
-      address: "주소",
-    });
+    const res = await addDoc(storeCollectionRef, doc);
     console.log(res);
   } catch (e) {
     throw new Error("Error");
   }
 };
-// addStore();
 
-const getStore = async () => {
+export const setDocStore = async (formDoc: StoreDoc) => {
+  const id = formDoc.id;
+  const storeRef = doc(db, "stores", id);
+  try {
+    const res = await setDoc(storeRef, formDoc, { merge: true });
+    console.log(res);
+  } catch (e) {
+    throw new Error("Error");
+  }
+};
+
+export const setDocReview = async (
+  id: string,
+  reviewID: string,
+  review: Object
+) => {
+  const reviewRef = doc(db, "stores", id, "review", reviewID);
+  try {
+    const res = await setDoc(reviewRef, review, { merge: true });
+    console.log(res);
+  } catch (e) {
+    throw new Error("Error");
+  }
+};
+
+/** 
+const getDocList = async () => {
   try {
     const docSnap = await getDocs(storeCollectionRef);
     docSnap.forEach((doc) => {
@@ -62,7 +103,19 @@ const getStore = async () => {
     throw new Error("Error");
   }
 };
-// getStore();
+*/
+
+export const getDocStore = async (id: string) => {
+  const storeRef = doc(db, "stores", id);
+  try {
+    const docSnap = await getDoc(storeRef);
+    if (docSnap.exists()) {
+      return docSnap.data();
+    }
+  } catch (e) {
+    throw new Error("Error");
+  }
+};
 
 //데이터구조
 /**

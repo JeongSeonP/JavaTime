@@ -12,6 +12,7 @@ import StoreSearch from "./pages/StoreSearch";
 import CreateReview from "./pages/CreateReview";
 import CreateProfile from "./pages/CreateProfile";
 import { QueryClient, QueryClientProvider } from "react-query";
+import StorePage from "./pages/StorePage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,6 +30,7 @@ const App = () => {
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/store/:storeId" element={<StorePage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/join" element={<Join />} />
             <Route path="/mypage" element={<MyPage />} />

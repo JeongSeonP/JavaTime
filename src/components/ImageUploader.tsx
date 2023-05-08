@@ -30,18 +30,35 @@ const ImageUploader = () => {
       <div className="flex justify-center items-center text-sm font-semibold">
         <label
           htmlFor="imageInput"
-          className="w-20 bg-primary/50 hover:bg-primary/70 h-36 rounded-l-lg shadow flex items-center justify-center"
+          className="w-20 text-xs text-primary-dark-color bg-primary/40 hover:bg-primary/70 h-36 rounded-l-lg shadow flex flex-col items-center justify-center"
         >
-          사진
-          <br />
-          선택
+          <div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+              <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z" />
+            </svg>
+          </div>
+          <p>찾아보기</p>
         </label>
-        <div className="w-36 h-36 inline-block my-3 rounded-r-lg shadow bg-[#fff] overflow-hidden relative">
-          <img
-            src={imgFile?.thumnail}
-            alt={imgFile?.name}
-            className="inline-block"
-          />
+        <div className="w-36 h-36 flex justify-center items-center rounded-r-lg shadow bg-[#fff] overflow-hidden relative">
+          {imgFile ? (
+            <img
+              src={imgFile.thumnail}
+              alt={imgFile.name}
+              className="inline-block"
+            />
+          ) : (
+            <div className="text-xs font-thin text-neutral-400">
+              <p>선택된 사진이</p>
+              <p>없습니다.</p>
+            </div>
+          )}
           <button
             onClick={() => setImgFile(null)}
             className="w-5 h-5 border rounded-full text-primary flex justify-center items-center bg-[#fff] hover:bg-primary hover:text-base-100 absolute top-1 right-1"

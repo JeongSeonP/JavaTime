@@ -8,6 +8,7 @@ export default {
       colors: {
         "base-color": "#efeae6",
         "base-dark-color": "#52453a",
+        "primary-dark-color": "#398d90",
       },
     },
     screens: {
