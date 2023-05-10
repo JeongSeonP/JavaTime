@@ -6,8 +6,10 @@ import { useForm } from "react-hook-form";
 import ImageUploader from "../components/ImageUploader";
 import Modal from "../components/Modal";
 import { getStation } from "../kakaoAPI";
-import { addStore, auth, setDocReview, setDocStore } from "../firebase";
+import { auth, setDocReview, setDocStore } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { useMutation, useQueryClient } from "react-query";
+import { Timestamp } from "firebase/firestore";
 
 //이 페이지는 선택된 업체정보가 없으면 접근 못하게해야할듯.
 //리뷰작성 취소할때, 등록할때 모두 selectedstore도 초기화해야할듯.
@@ -50,6 +52,17 @@ const CreateReview = () => {
       text: "",
     },
   });
+  const queryClient = useQueryClient();
+  const { mutate: docMutate } = useMutation(setDocStore, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["storeInfo", store.id]);
+    },
+  });
+  const { mutate: reviewMutate } = useMutation(setDocReview, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["reviewInfo", store.id]);
+    },
+  });
   const rate = watch("rating");
   const flavorList = [
     ["sour", "산미가 있어요"],
@@ -80,7 +93,7 @@ const CreateReview = () => {
     navigate("/storeselect");
   };
 
-  console.log(new Date().toLocaleString("en-US").split(",")[0]);
+  console.log(Timestamp.fromDate(new Date()));
 
   //지하철역 구한담에 이미지파일 처리, firestore올릴 데이터형식 만들고 setDoc하기
   const createDoc = async (formData: ReviewForm) => {
@@ -95,27 +108,31 @@ const CreateReview = () => {
       phone: phone,
       storeName: storeName,
       address: address,
+      x: x,
+      y: y,
       stationList: stationList,
     };
     const review = {
-      [reviewID]: {
-        date: createdDate,
-        user: {
-          email: user?.email,
-          displayName: user?.displayName,
-          uid: user?.uid,
-        },
-        flavor: flavor,
-        richness: richness,
-        text: text,
-        rating: rating,
+      // [reviewID]: {
+      reviewID: reviewID,
+      date: createdDate,
+      user: {
+        email: user?.email,
+        displayName: user?.displayName,
+        uid: user?.uid,
       },
+      flavor: flavor,
+      richness: richness,
+      text: text,
+      rating: rating,
+      // },
     };
-    await setDocStore(newDoc);
-    await setDocReview(id, reviewID, review);
+    docMutate(newDoc);
+    reviewMutate({ id, reviewID, review });
+    // await setDocStore(newDoc);
+    // await setDocReview(id, reviewID, review);
     console.log("등록완료");
-    navigate(`/store/${id}`);
-    //이후에 해당 업체별페이지로 이동
+    navigate(`/store/${id}`, { replace: true });
   };
 
   const handleSubmit = (formData: ReviewForm) => {

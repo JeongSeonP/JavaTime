@@ -1,0 +1,90 @@
+import { useEffect, useRef, useState } from "react";
+declare global {
+  interface Window {
+    kakao: any;
+  }
+}
+interface Option {
+  x: number;
+  y: number;
+  name: string;
+  id: string;
+}
+
+interface Props {
+  mapOption: Option;
+}
+
+const KakaoMap = ({ mapOption }: Props) => {
+  const container = useRef(null);
+  const overlayContainer = useRef(null);
+  const { x, y, name, id } = mapOption;
+  const KAKAO_JAVASCRIPT_KEY = import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY;
+  const href = `http://place.map.kakao.com/${id}`;
+
+  useEffect(() => {
+    const { kakao } = window;
+    const script = document.createElement("script");
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JAVASCRIPT_KEY}&autoload=false`;
+    document.head.appendChild(script);
+    script.onload = () => {
+      window.kakao.maps.load(() => {
+        const kakaoMap = window.kakao.maps;
+        const position = new kakaoMap.LatLng(y, x);
+        const mapOption = {
+          center: position,
+          level: 5,
+        };
+        const map = new kakaoMap.Map(container.current, mapOption);
+        const imageSrc = "/src/assets/javatime.png",
+          imageSize = new kakaoMap.Size(20, 20),
+          imageOption = { offset: new kakaoMap.Point(10, 10) };
+
+        const markerImage = new kakaoMap.MarkerImage(
+          imageSrc,
+          imageSize,
+          imageOption
+        );
+        const marker = new kakaoMap.Marker({
+          position: mapOption.center,
+          image: markerImage,
+        });
+        marker.setMap(map);
+
+        const overlay = new kakaoMap.CustomOverlay({
+          position: position,
+          map: map,
+          content: overlayContainer.current,
+          yAnchor: 1.5,
+        });
+        map.relayout();
+      });
+    };
+  }, [id]);
+
+  return (
+    <div className="rounded-xl shadow-md overflow-hidden mb-2">
+      <div ref={overlayContainer} className="relative inline-block z-[999]">
+        <div className="flex items-center w-fit py-1 px-3 h-5 rounded-md bg-primary-light-color  text-xs  after:content-['']  after:absolute after:left-[50%] after:rotate-45 after:-translate-x-2/4 after:-bottom-1 after:w-2 after:h-2 after:bg-primary-light-color after:border-b-4 after:border-r-4 after:border-primary-light-color shadow-[1px_2px_2px_0px_#fff] after:shadow-[1px_1px_1px_0px_#fff]">
+          <a
+            href={href}
+            className=" "
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="inline-block w-full text-center font-semibold">
+              {name}
+            </span>
+          </a>
+        </div>
+      </div>
+      <div
+        className="md:w-[150px] md:h-[150px] w-[350px] h-[120px]"
+        id="container"
+        ref={container}
+      />
+    </div>
+  );
+};
+
+export default KakaoMap;

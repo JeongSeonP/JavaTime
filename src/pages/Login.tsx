@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -13,6 +13,8 @@ const Login = () => {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectedFrom = location?.state?.redirectedFrom?.pathname || "/";
   const [signInWithEmailAndPassword, user, loading, error] =
     useSignInWithEmailAndPassword(auth);
   const [signInWithGoogle, GGuser, GGloading, GGerror] =
@@ -22,7 +24,7 @@ const Login = () => {
     if (user || GGuser) {
       setEmail("");
       setPassword("");
-      navigate("/");
+      navigate(redirectedFrom);
     }
 
     if (error || GGerror) {

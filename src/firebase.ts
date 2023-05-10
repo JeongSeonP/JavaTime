@@ -12,7 +12,11 @@ import {
   getFirestore,
   query,
   serverTimestamp,
+  DocumentData,
+  where,
+  orderBy,
 } from "firebase/firestore";
+import { useQuery } from "react-query";
 
 // import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -41,30 +45,48 @@ export const db = getFirestore(app);
 
 //firestore 생성 테스트
 
-interface StoreDoc {
+export interface StoreDoc {
   id: string;
   phone: string;
   storeName: string;
   address: string;
   stationList: string[];
-  //review: Object;
+  x: string;
+  y: string;
 }
 
 interface ReviewDoc {
-  id: string;
-  review: Object;
+  reviewID: string;
+  date: string;
+  user: {
+    email: string | null | undefined;
+    displayName: string | null | undefined;
+    uid: string | undefined;
+  };
+  flavor: string;
+  richness: string;
+  text: string;
+  rating: string;
 }
 
-const storeCollectionRef = collection(db, "stores");
+interface ReviewDocProp {
+  id: string;
+  reviewID: string;
+  review: ReviewDoc;
+}
 
-export const addStore = async (doc: StoreDoc) => {
-  try {
-    const res = await addDoc(storeCollectionRef, doc);
-    console.log(res);
-  } catch (e) {
-    throw new Error("Error");
-  }
-};
+// const storeCollectionRef = collection(db, "stores");
+
+// export const addStore = async (doc: StoreDoc) => {
+//   try {
+//     const res = await addDoc(storeCollectionRef, doc);
+//     console.log(res);
+//   } catch (e) {
+//     throw new Error("Error");
+//   }
+// };
+
+//setDoc도 유즈쿼리써서 업데이트 후 데이터 다시 받아오게끔해야함.
 
 export const setDocStore = async (formDoc: StoreDoc) => {
   const id = formDoc.id;
@@ -77,11 +99,7 @@ export const setDocStore = async (formDoc: StoreDoc) => {
   }
 };
 
-export const setDocReview = async (
-  id: string,
-  reviewID: string,
-  review: Object
-) => {
+export const setDocReview = async ({ id, reviewID, review }: ReviewDocProp) => {
   const reviewRef = doc(db, "stores", id, "review", reviewID);
   try {
     const res = await setDoc(reviewRef, review, { merge: true });
@@ -91,21 +109,45 @@ export const setDocReview = async (
   }
 };
 
-/** 
-const getDocList = async () => {
+//페이지화 추가필요
+export const getReviewList = async (id: string | undefined) => {
+  if (id === undefined) return;
+  const q = query(
+    collection(db, "stores", id, "review"),
+    orderBy("date", "desc")
+  );
   try {
-    const docSnap = await getDocs(storeCollectionRef);
-    docSnap.forEach((doc) => {
-      console.log(doc.data());
+    const snapShot = await getDocs(q);
+    const reviewList: DocumentData | null = [];
+    snapShot.forEach((doc) => {
+      reviewList.push(doc.data());
     });
-    console.log(docSnap);
+    return reviewList;
   } catch (e) {
     throw new Error("Error");
   }
 };
-*/
 
-export const getDocStore = async (id: string) => {
+// export const getRate = async (id: string | undefined) => {
+//   if (id === undefined) return;
+//   const q = query(
+//     collection(db, "stores", id, "review"),
+//     where("rating", "==", "5")
+//   );
+//   try {
+//     const snapShot = await getDocs(q);
+//     const rateList: DocumentData | null = [];
+//     snapShot.forEach((doc) => {
+//       rateList.push(doc.data());
+//     });
+//     return rateList;
+//   } catch (e) {
+//     throw new Error("Error");
+//   }
+// };
+
+export const getDocStore = async (id: string | undefined) => {
+  if (id === undefined) return;
   const storeRef = doc(db, "stores", id);
   try {
     const docSnap = await getDoc(storeRef);
@@ -116,6 +158,14 @@ export const getDocStore = async (id: string) => {
     throw new Error("Error");
   }
 };
+
+// export const useGetStore = (id: string | undefined) => {
+//   if (id === undefined) return;
+//   const { data, isLoading, error } = useQuery(["storeInfo", id], () =>
+//     getDocStore(id)
+//   );
+//   return { data, isLoading, error };
+// };
 
 //데이터구조
 /**
