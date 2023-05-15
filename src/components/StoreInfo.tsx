@@ -1,24 +1,28 @@
 import { DocumentData } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import KakaoMap from "./KakaoMap";
+import StarRate from "./StarRate";
 
-interface ReviewInfo {
-  reviewLength: number;
-  averageRate: string;
-}
-interface Props {
-  info: DocumentData;
-  reviewInfo: ReviewInfo;
-}
+// interface ReviewInfo {
+//   reviewLength: number;
+//   averageRate: string;
+// }
+// interface Props {
+//   info: DocumentData;
+// reviewInfo: ReviewInfo;
+// }
 
-const StoreInfo = ({ info, reviewInfo }: Props) => {
+const StoreInfo = ({ info }: DocumentData) => {
   const [mapOption, setMapOption] = useState({
     x: 0,
     y: 0,
     name: "",
     id: "",
   });
-  const starWidth = 16;
+  const phoneNumber = `tel:${info.phone}`;
+  const averageRate = (info.ttlRate / info.ttlParticipants)
+    .toFixed(1)
+    .toString();
 
   useEffect(() => {
     const { id, storeName, x, y } = info;
@@ -33,71 +37,48 @@ const StoreInfo = ({ info, reviewInfo }: Props) => {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row items-center justify-center w-full max-w-xl">
-        <div className="flex items-center justify-center mb-2">
-          <div className="w-[150px] h-[150px] mr-2 border border-neutral-300 rounded-xl overflow-hidden shrink-0">
-            <img
+      <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-xl">
+        <div className="flex items-center justify-start md:justify-between mb-2 w-[350px]">
+          <div className="flex items-center justify-center w-[130px] h-[130px] md:w-[150px] md:h-[150px] bg-[#fff] mr-2 border border-neutral-300 rounded-xl overflow-hidden shrink-0">
+            <i className="ico-coffeeBean text-base-200 text-5xl"></i>
+            {/* <img
               src="https://via.placeholder.com/150/fff"
               alt="업체리뷰이미지"
-            />
+            /> */}
           </div>
 
-          <div className="flex flex-col justify-center ml-2 min-w-[200px]">
-            <p className="mb-2 md:mt-2 text-left shrink-0  md:leading-loose">
-              {info.storeName}
-            </p>
-
-            <p className="md:text-sm truncate text-xs text-left">
+          <div className="flex flex-col justify-between ml-1">
+            <p className="max-w-[200px] md:max-w-[250px]  text-sm text-left mb-1 font-semibold">
               {info.address}
             </p>
+            <div className="lex justify-center items-center md:text-sm text-xs text-left">
+              {info.phone === "" ? null : (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                    className="inline-block w-2.5 mr-1 mb-0.5"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z"
+                    />
+                  </svg>
+                  <p className="inline-block">
+                    <a href={phoneNumber}>{info.phone}</a>
+                  </p>
+                </>
+              )}
+            </div>
 
             <div className="flex w-[140px] justify-between ">
               <span className="inline-block mt-0.5 font-semibold text-secondary-content">
-                {reviewInfo.averageRate}
+                {averageRate}
               </span>
-              <div className="relative inline-block ml-1 w-[84px] h-[18px]">
-                <div className="absolute top-0 ">
-                  {Array(5)
-                    .fill(null)
-                    .map((_, i) => (
-                      <svg
-                        key={i}
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        viewBox="0 0 16 16"
-                        className="inline-block text-neutral-300"
-                      >
-                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                      </svg>
-                    ))}
-                </div>
-                <div
-                  className="absolute  overflow-hidden whitespace-nowrap"
-                  style={{
-                    width: `${Number(reviewInfo.averageRate) * starWidth}px`,
-                  }}
-                >
-                  {Array(5)
-                    .fill(null)
-                    .map((_, i) => (
-                      <svg
-                        key={i}
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        viewBox="0 0 16 16"
-                        className="inline-block text-accent"
-                      >
-                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                      </svg>
-                    ))}
-                </div>
-              </div>
+              <StarRate rate={averageRate} />
               <span className="inline-block mt-0.5">
-                ({reviewInfo.reviewLength})
+                ({info.ttlParticipants})
               </span>
             </div>
           </div>

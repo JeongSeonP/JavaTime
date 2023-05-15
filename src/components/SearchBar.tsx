@@ -16,6 +16,7 @@ const SearchBar = ({ value, dispatchValue, handler }: props) => {
         placeholder="Search..."
         spellCheck={false}
         className="input input-bordered w-[400px] bg-[#fff] focus:outline-none"
+        autoFocus
       />
       <button className="btn btn-square">
         <svg

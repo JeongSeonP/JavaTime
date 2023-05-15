@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import FormBoard from "../components/FormBoard";
 import { useEffect, useState } from "react";
-import cx from "clsx";
 import { useForm } from "react-hook-form";
 import ImageUploader from "../components/ImageUploader";
 import Modal from "../components/Modal";
@@ -10,6 +9,8 @@ import { auth, setDocReview, setDocStore } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useMutation, useQueryClient } from "react-query";
 import { Timestamp } from "firebase/firestore";
+import { flavorList, richnessList } from "../components/SelectOptions";
+import { queryClient } from "../App";
 
 //이 페이지는 선택된 업체정보가 없으면 접근 못하게해야할듯.
 //리뷰작성 취소할때, 등록할때 모두 selectedstore도 초기화해야할듯.
@@ -26,7 +27,7 @@ export interface ReviewForm {
 
 const CreateReview = () => {
   const [modal, setModal] = useState(false);
-  const [fileName, setFileName] = useState("");
+  // const [fileName, setFileName] = useState("");
   const navigate = useNavigate();
   const [user] = useAuthState(auth);
   const [store, setStore] = useState({
@@ -52,7 +53,7 @@ const CreateReview = () => {
       text: "",
     },
   });
-  const queryClient = useQueryClient();
+
   const { mutate: docMutate } = useMutation(setDocStore, {
     onSuccess: () => {
       queryClient.invalidateQueries(["storeInfo", store.id]);
@@ -64,15 +65,7 @@ const CreateReview = () => {
     },
   });
   const rate = watch("rating");
-  const flavorList = [
-    ["sour", "산미가 있어요"],
-    ["nutty", "고소해요"],
-  ];
-  const richnessList = [
-    ["rich", "커피맛이 진해요"],
-    ["bland", "커피맛이 싱거워요"],
-    ["bitter", "커피맛이 써요"],
-  ];
+
   const modalOption = {
     h3: "리뷰 남기실 카페를 먼저 선택해주세요.",
     p: "아래 버튼을 누르시면 카페 선택 페이지로 이동합니다.",
@@ -93,7 +86,7 @@ const CreateReview = () => {
     navigate("/storeselect");
   };
 
-  console.log(Timestamp.fromDate(new Date()));
+  // console.log(Timestamp.fromDate(new Date()));
 
   //지하철역 구한담에 이미지파일 처리, firestore올릴 데이터형식 만들고 setDoc하기
   const createDoc = async (formData: ReviewForm) => {
@@ -113,7 +106,6 @@ const CreateReview = () => {
       stationList: stationList,
     };
     const review = {
-      // [reviewID]: {
       reviewID: reviewID,
       date: createdDate,
       user: {
@@ -125,9 +117,8 @@ const CreateReview = () => {
       richness: richness,
       text: text,
       rating: rating,
-      // },
     };
-    docMutate(newDoc);
+    docMutate({ newDoc, rating });
     reviewMutate({ id, reviewID, review });
     // await setDocStore(newDoc);
     // await setDocReview(id, reviewID, review);
@@ -211,7 +202,7 @@ const CreateReview = () => {
                   </g>
                 </svg>
               </span>
-              {flavorList.map(([value, description]) => (
+              {Object.entries(flavorList).map(([value, description]) => (
                 <label
                   key={value}
                   className="label cursor-pointer w-1/3 justify-start"
@@ -254,7 +245,7 @@ const CreateReview = () => {
             <div className="flex items-center">
               <span>
                 <svg
-                  className=" w-9 h-9 inline-block px-2 inline-block px-2 "
+                  className=" w-9 h-9 inline-block px-2 "
                   version="1.0"
                   xmlns="http://www.w3.org/2000/svg"
                   width="124.000000pt"
@@ -288,7 +279,7 @@ const CreateReview = () => {
                   </g>
                 </svg>
               </span>
-              {richnessList.map(([value, description]) => (
+              {Object.entries(richnessList).map(([value, description]) => (
                 <label
                   key={value}
                   className="label cursor-pointer w-1/3 justify-start"

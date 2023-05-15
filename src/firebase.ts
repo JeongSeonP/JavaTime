@@ -15,8 +15,14 @@ import {
   DocumentData,
   where,
   orderBy,
+  startAt,
+  limit,
+  startAfter,
+  updateDoc,
+  increment,
 } from "firebase/firestore";
 import { useQuery } from "react-query";
+import { ReviewDocumentData } from "./pages/StorePage";
 
 // import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -53,6 +59,13 @@ export interface StoreDoc {
   stationList: string[];
   x: string;
   y: string;
+  // rate: number;
+  // participantCount: number;
+}
+
+interface StoreDocProp {
+  newDoc: StoreDoc;
+  rating: string;
 }
 
 interface ReviewDoc {
@@ -68,6 +81,19 @@ interface ReviewDoc {
   text: string;
   rating: string;
 }
+interface ReviewDocData {
+  reviewID: string;
+  date: string;
+  user: {
+    email: string;
+    displayName: string | null;
+    uid: string;
+  };
+  flavor: "sour" | "nutty";
+  richness: "rich" | "bland" | "bitter";
+  text: string;
+  rating: string;
+}
 
 interface ReviewDocProp {
   id: string;
@@ -75,25 +101,15 @@ interface ReviewDocProp {
   review: ReviewDoc;
 }
 
-// const storeCollectionRef = collection(db, "stores");
-
-// export const addStore = async (doc: StoreDoc) => {
-//   try {
-//     const res = await addDoc(storeCollectionRef, doc);
-//     console.log(res);
-//   } catch (e) {
-//     throw new Error("Error");
-//   }
-// };
-
-//setDoc도 유즈쿼리써서 업데이트 후 데이터 다시 받아오게끔해야함.
-
-export const setDocStore = async (formDoc: StoreDoc) => {
-  const id = formDoc.id;
+export const setDocStore = async ({ newDoc, rating }: StoreDocProp) => {
+  const id = newDoc.id;
   const storeRef = doc(db, "stores", id);
   try {
-    const res = await setDoc(storeRef, formDoc, { merge: true });
-    console.log(res);
+    await setDoc(storeRef, newDoc, { merge: true });
+    await updateDoc(storeRef, {
+      ttlRate: increment(Number(rating)),
+      ttlParticipants: increment(1),
+    });
   } catch (e) {
     throw new Error("Error");
   }
@@ -103,48 +119,87 @@ export const setDocReview = async ({ id, reviewID, review }: ReviewDocProp) => {
   const reviewRef = doc(db, "stores", id, "review", reviewID);
   try {
     const res = await setDoc(reviewRef, review, { merge: true });
-    console.log(res);
   } catch (e) {
     throw new Error("Error");
   }
 };
 
-//페이지화 추가필요
-export const getReviewList = async (id: string | undefined) => {
-  if (id === undefined) return;
-  const q = query(
-    collection(db, "stores", id, "review"),
-    orderBy("date", "desc")
-  );
-  try {
-    const snapShot = await getDocs(q);
-    const reviewList: DocumentData | null = [];
-    snapShot.forEach((doc) => {
-      reviewList.push(doc.data());
-    });
-    return reviewList;
-  } catch (e) {
-    throw new Error("Error");
+export const getReviewList = async (
+  id: string | undefined,
+  pageParam: number | string
+) => {
+  if (id === undefined || pageParam === null) return;
+  console.log(pageParam);
+  const perPage = 5;
+
+  if (pageParam === 0) {
+    try {
+      const q = query(
+        collection(db, "stores", id, "review"),
+        orderBy("date", "desc"),
+        limit(perPage + 1)
+      );
+      const snapShot = await getDocs(q);
+      const reviewList = snapShot.docs.map((doc) =>
+        doc.data()
+      ) as ReviewDocData[];
+      const lastDoc = snapShot.docs[perPage - 1];
+      const nextPage = lastDoc ? lastDoc.data().reviewID : null;
+      const hasNextPage = nextPage ? reviewList.length === perPage + 1 : false;
+      if (reviewList.length === perPage + 1) {
+        reviewList.splice(5, 1);
+      }
+      const result: ReviewDocumentData = {
+        reviewList: reviewList,
+        nextPage: nextPage,
+        hasNextPage: hasNextPage,
+      };
+
+      return result;
+    } catch (e) {
+      throw new Error("Error");
+    }
+  } else if (pageParam !== 0) {
+    try {
+      const startAfterRef = doc(db, "stores", id, "review", String(pageParam));
+      const startAfterSnap = await getDoc(startAfterRef);
+
+      if (startAfterSnap.exists()) {
+        const nextQ = query(
+          collection(db, "stores", id, "review"),
+          orderBy("date", "desc"),
+          startAfter(startAfterSnap),
+          limit(perPage + 1)
+        );
+        const nextSnapShot = await getDocs(nextQ);
+        const reviewList = nextSnapShot.docs.map((doc) =>
+          doc.data()
+        ) as ReviewDocData[];
+
+        const lastDoc = nextSnapShot.docs[perPage - 1];
+        const nextPage = lastDoc ? lastDoc.data().reviewID : null;
+        const hasNextPage = nextPage
+          ? reviewList.length === perPage + 1
+          : false;
+        console.log("길이", reviewList.length === perPage + 1);
+        console.log("hasNextPage", hasNextPage);
+
+        if (reviewList.length === perPage + 1) {
+          reviewList.splice(5, 1);
+        }
+        const result: ReviewDocumentData = {
+          reviewList: reviewList,
+          nextPage: nextPage,
+          hasNextPage: hasNextPage,
+        };
+
+        return result;
+      }
+    } catch (e) {
+      throw new Error("Error");
+    }
   }
 };
-
-// export const getRate = async (id: string | undefined) => {
-//   if (id === undefined) return;
-//   const q = query(
-//     collection(db, "stores", id, "review"),
-//     where("rating", "==", "5")
-//   );
-//   try {
-//     const snapShot = await getDocs(q);
-//     const rateList: DocumentData | null = [];
-//     snapShot.forEach((doc) => {
-//       rateList.push(doc.data());
-//     });
-//     return rateList;
-//   } catch (e) {
-//     throw new Error("Error");
-//   }
-// };
 
 export const getDocStore = async (id: string | undefined) => {
   if (id === undefined) return;

@@ -15,7 +15,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import StorePage from "./pages/StorePage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: Infinity,
