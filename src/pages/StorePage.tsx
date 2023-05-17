@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getDocStore, getReviewList } from "../firebase";
 import { DocumentData } from "firebase/firestore";
 import { Key, useEffect, useState } from "react";
@@ -41,7 +41,8 @@ export interface ReviewDocumentData extends DocumentData {
 
 const StorePage = () => {
   const { storeId } = useParams();
-  const [storeInfo, setStoreInfo] = useState<DocumentData | null>(null);
+  const navigate = useNavigate();
+  // const [storeInfo, setStoreInfo] = useState<DocumentData | null>(null);
   const [isLast, setIsLast] = useState(false);
   // const [review, setReview] = useState<ReviewDoc[] | null>(null);
   const [reviewInfo, setReviewInfo] = useState({
@@ -84,13 +85,7 @@ const StorePage = () => {
   }, [reviewDoc]);
 
   //로딩컴포넌트만들기
-  //리뷰에 댓글기능도 필요
-
-  useEffect(() => {
-    if (storeDoc) {
-      setStoreInfo(storeDoc);
-    }
-  }, [storeDoc]);
+  //리뷰에 댓글기능도 필요 - updateDoc으로
 
   const handlePage = () => {
     // setPage((page) => page + 1);
@@ -98,10 +93,25 @@ const StorePage = () => {
     console.log("isFetchingNextPage", isFetchingNextPage);
   };
 
+  const goToReview = () => {
+    if (storeDoc) {
+      const store = {
+        id: storeDoc.id,
+        phone: storeDoc.phone,
+        storeName: storeDoc.storeName,
+        address: storeDoc.address,
+        x: storeDoc.x,
+        y: storeDoc.y,
+      };
+      sessionStorage.setItem("selectedStore", JSON.stringify(store));
+    }
+    navigate("/review");
+  };
+
   if (isLoading) {
     return <main>loading..</main>;
   }
-  if (!storeInfo || error) {
+  if (!storeDoc || error) {
     return <main>업체정보가 없습니다.</main>;
   }
 
@@ -109,10 +119,15 @@ const StorePage = () => {
     <main className="pt-10 pb-20">
       <div className=" w-4/5 mx-auto text-center flex flex-col justify-center items-center">
         <h2 className="font-semibold  mb-4 text-lg flex justify-center items-center mx-auto w-fit px-7 h-12 rounded-full shadow ">
-          {storeInfo.storeName}
+          {storeDoc.storeName}
         </h2>
-        <StoreInfo info={storeInfo} />
-        {/* <KakaoMap mapOption={mapOption} /> */}
+        <StoreInfo info={storeDoc} map={true} />
+        <button
+          onClick={goToReview}
+          className="btn md:w-full max-w-xl w-[350px]"
+        >
+          리뷰 등록하기
+        </button>
         <ul className="md:w-full max-w-xl w-[350px] text-xs md:text-sm">
           {reviewDoc?.pages.map((page) =>
             page?.reviewList.map((review: ReviewDoc) => (
@@ -157,7 +172,7 @@ const StorePage = () => {
         {!isLast ? (
           <button
             onClick={handlePage}
-            className="btn btn-ghost w-3/4 bg-base-200 hover:bg-base-300"
+            className="btn btn-ghost w-3/4 sm:w-1/2 bg-base-200 hover:bg-base-300"
           >
             더보기
           </button>

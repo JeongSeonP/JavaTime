@@ -1,86 +1,112 @@
+import { DocumentData } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 declare global {
   interface Window {
     kakao: any;
   }
 }
-interface Option {
-  x: number;
-  y: number;
-  name: string;
-  id: string;
-}
 
-interface Props {
-  mapOption: Option;
-}
-
-const KakaoMap = ({ mapOption }: Props) => {
+const KakaoMap = ({ info }: DocumentData) => {
   const container = useRef(null);
   const overlayContainer = useRef(null);
-  const { x, y, id, name } = mapOption;
   const [storeMap, setStoreMap] = useState<any>(null);
-  const [position, setPosition] = useState<any>(null);
+  //const [position, setPosition] = useState<any>(null);
   const KAKAO_JAVASCRIPT_KEY = import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY;
-  const href = `http://place.map.kakao.com/${id}`;
+  const href = `http://place.map.kakao.com/${info.id}`;
 
   useEffect(() => {
-    let script: HTMLScriptElement | null =
-      document.querySelector(".kakaoScript");
-    if (!script) {
-      script = document.createElement("script");
+    const script = document.createElement("script");
+    script.className = "kakaoScript";
+    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JAVASCRIPT_KEY}&autoload=false`;
+    document.head.appendChild(script);
+    script.onload = () => {
+      window.kakao.maps.load(() => {
+        const kakaoMap = window.kakao.maps;
+        const position = new kakaoMap.LatLng(Number(info.y), Number(info.x));
+        //setPosition(position);
+        const options = {
+          center: position,
+          level: 5,
+        };
+        const map = new kakaoMap.Map(container.current, options);
 
-      script.className = "kakaoScript";
-      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JAVASCRIPT_KEY}&autoload=false`;
-      document.head.appendChild(script);
-    }
-    // script.onload = () => {
-    window.kakao.maps.load(() => {
-      const kakaoMap = window.kakao.maps;
-      const position = new kakaoMap.LatLng(y, x);
-      setPosition(position);
-      const options = {
-        center: position,
-        level: 5,
-      };
-      const map = new kakaoMap.Map(container.current, options);
+        const imageSrc = "/src/assets/javatime.png",
+          imageSize = new kakaoMap.Size(20, 20),
+          imageOption = { offset: new kakaoMap.Point(10, 10) };
 
-      const imageSrc = "/src/assets/javatime.png",
-        imageSize = new kakaoMap.Size(20, 20),
-        imageOption = { offset: new kakaoMap.Point(10, 10) };
+        const markerImage = new kakaoMap.MarkerImage(
+          imageSrc,
+          imageSize,
+          imageOption
+        );
+        const marker = new kakaoMap.Marker({
+          position: options.center,
+          image: markerImage,
+        });
+        marker.setMap(map);
 
-      const markerImage = new kakaoMap.MarkerImage(
-        imageSrc,
-        imageSize,
-        imageOption
-      );
-      const marker = new kakaoMap.Marker({
-        position: options.center,
-        image: markerImage,
+        new kakaoMap.CustomOverlay({
+          position: position,
+          map: map,
+          content: overlayContainer.current,
+          yAnchor: 1.5,
+        });
+        setStoreMap(map);
+        //map.relayout();
       });
-      marker.setMap(map);
-
-      new kakaoMap.CustomOverlay({
-        position: position,
-        map: map,
-        content: overlayContainer.current,
-        yAnchor: 1.5,
-      });
-      setStoreMap(map);
-      //map.relayout();
-    });
-    // };
-  }, [container, id]);
+    };
+    return () => script.remove();
+  }, [container, info]);
 
   useEffect(() => {
     if (storeMap) {
-      storeMap.setCenter(position);
+      // storeMap.setCenter(position);
       // storeMap.setLevel(4);
       // storeMap.relayout();
       // storeMap.setLevel(5);
       storeMap.relayout();
+      console.log("storeMap", storeMap);
     }
-  }, [container]);
+  }, [storeMap, info]);
+
+  // const createMap = () => {
+  //   if (container.current === null) return;
+  //   const { kakao } = window;
+  //   window.kakao.maps.load(() => {
+  //     const kakaoMap = window.kakao.maps;
+  //     const position = new kakao.maps.LatLng(Number(info.y), Number(info.x));
+  //     setPosition(position);
+  //     console.log("position", position);
+  //     const options = {
+  //       center: position,
+  //       level: 5,
+  //     };
+  //     const map = new kakaoMap.Map(container.current, options);
+  //     const imageSrc = "/src/assets/javatime.png",
+  //       imageSize = new kakaoMap.Size(20, 20),
+  //       imageOption = { offset: new kakaoMap.Point(10, 10) };
+
+  //     const markerImage = new kakaoMap.MarkerImage(
+  //       imageSrc,
+  //       imageSize,
+  //       imageOption
+  //     );
+  //     const marker = new kakaoMap.Marker({
+  //       position: options.center,
+  //       image: markerImage,
+  //     });
+  //     marker.setMap(map);
+
+  //     new kakaoMap.CustomOverlay({
+  //       position: position,
+  //       map: map,
+  //       content: overlayContainer.current,
+  //       yAnchor: 1.5,
+  //     });
+  //     setStoreMap(map);
+  //     //map.relayout();
+  //   });
+  // };
   /*
   useEffect(() => {
     const kakaoScript = document.querySelector(".kakaoScript");
@@ -134,7 +160,7 @@ const KakaoMap = ({ mapOption }: Props) => {
             rel="noopener noreferrer"
           >
             <span className="inline-block w-full text-center font-semibold">
-              {name}
+              {info.storeName}
             </span>
           </a>
         </div>

@@ -7,7 +7,7 @@ import { getSearchedStoreInfo } from "../kakaoAPI";
 import Modal from "../components/Modal";
 import cx from "clsx";
 
-interface StoreProps {
+export interface StoreProps {
   id: string;
   place_name: string;
   phone: string;
@@ -118,6 +118,7 @@ const StoreSearch = () => {
             value={searchInput}
             dispatchValue={setSearchInput}
             handler={handleSubmit}
+            placeHolder="카페이름을 검색해보세요"
           />
           {noResult ? (
             <div className="mt-6">검색결과가 없습니다.</div>

@@ -123,6 +123,7 @@ const CreateReview = () => {
     // await setDocStore(newDoc);
     // await setDocReview(id, reviewID, review);
     console.log("등록완료");
+    sessionStorage.clear();
     navigate(`/store/${id}`, { replace: true });
   };
 

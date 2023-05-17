@@ -2,11 +2,36 @@ import { Link, useNavigate } from "react-router-dom";
 import Board from "../components/Board";
 import SearchBar from "../components/SearchBar";
 import StoreList from "../components/StoreList";
+import { useEffect, useState } from "react";
+import { StoreProps } from "./StoreSearch";
+import { getSearchedStoreInfo } from "../kakaoAPI";
 
 //회원만 리뷰 작성할 수 있게 해야함.
+//요페이지는 아예 없앨까봐
 
 const StoreSelect = () => {
+  const [searchInput, setSearchInput] = useState("");
+  const [searchedList, setSearchedLIst] = useState<StoreProps[]>([]);
+  const [page, setPage] = useState("");
+  const [lastPage, setLastPage] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [noResult, setNoResult] = useState(false);
+  const [isSelected, setisSelected] = useState(false);
+  const [modal, setModal] = useState(false);
   const navigate = useNavigate();
+  const modalOption = {
+    h3: "선택된 카페가 없습니다. 카페를 선택해주세요.",
+    p: "카페선택을 계속하시려면 확인버튼을 눌러주세요.",
+    button: "확인",
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchedLIst([]);
+    setPage("1");
+    // getPage();
+  };
+
   return (
     <main className="pt-10 pb-20 ">
       <div className=" mx-auto text-center">
@@ -15,9 +40,11 @@ const StoreSelect = () => {
           <li className="step  before:scale-x-150 ml-3"></li>
         </ul>
         <Board title="카페 선택하기">
-          {/* <SearchBar  value={}
-            dispatchValue={}
-            handler={}/> */}
+          <SearchBar
+            value={searchInput}
+            dispatchValue={setSearchInput}
+            handler={handleSubmit}
+          />
           <StoreList stores={[]} />
           <div className="text-[14px] font-bold flex items-center justify-center h-6 my-3">
             <div className="inline-block">

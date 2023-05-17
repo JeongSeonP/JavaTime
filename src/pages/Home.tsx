@@ -1,15 +1,16 @@
 import { Link } from "react-router-dom";
-import SearchBar from "../components/SearchBar";
-import KakaoMap from "../components/KakaoMap";
+import StorePageSearch from "../components/StorePageSearch";
 
 const Home = () => {
   return (
     <main className="py-5">
       <div className="w-4/5 mx-auto text-center">
-        <section className="form-control py-5">{/* <SearchBar /> */}</section>
+        <section className="form-control py-5">
+          <StorePageSearch />
+        </section>
         <section>
           <button className="btn btn-primary bg-primary-light-color/70 hover:bg-primary/70 border-none">
-            <Link to={"/storeselect"} className="flex items-center h-full">
+            <Link to={"/storesearch"} className="flex items-center h-full">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"

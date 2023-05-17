@@ -41,15 +41,12 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-// const analytics = getAnalytics(app);
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
 // const currentUser = auth.currentUser;
 // console.log(currentUser);
-
-//firestore 생성 테스트
 
 export interface StoreDoc {
   id: string;
@@ -59,8 +56,6 @@ export interface StoreDoc {
   stationList: string[];
   x: string;
   y: string;
-  // rate: number;
-  // participantCount: number;
 }
 
 interface StoreDocProp {
@@ -118,7 +113,7 @@ export const setDocStore = async ({ newDoc, rating }: StoreDocProp) => {
 export const setDocReview = async ({ id, reviewID, review }: ReviewDocProp) => {
   const reviewRef = doc(db, "stores", id, "review", reviewID);
   try {
-    const res = await setDoc(reviewRef, review, { merge: true });
+    await setDoc(reviewRef, review, { merge: true });
   } catch (e) {
     throw new Error("Error");
   }
@@ -214,13 +209,38 @@ export const getDocStore = async (id: string | undefined) => {
   }
 };
 
-// export const useGetStore = (id: string | undefined) => {
-//   if (id === undefined) return;
-//   const { data, isLoading, error } = useQuery(["storeInfo", id], () =>
-//     getDocStore(id)
-//   );
-//   return { data, isLoading, error };
-// };
+export const findStoreByName = async (storeName: string) => {
+  const q = query(
+    collection(db, "stores"),
+    where("storeName", "==", storeName)
+  );
+  try {
+    const docSnap = await getDocs(q);
+    const storeList = docSnap.docs.map((doc) => doc.data());
+    return storeList;
+  } catch (e) {
+    throw new Error("Error");
+  }
+};
+
+export const findStoreByStation = async (station: string) => {
+  const lastword = station[station.length - 1];
+  if (lastword !== "역") {
+    station += "역";
+  }
+  console.log("station", station);
+  const q = query(
+    collection(db, "stores"),
+    where("stationList", "array-contains", station)
+  );
+  try {
+    const docSnap = await getDocs(q);
+    const storeList = docSnap.docs.map((doc) => doc.data());
+    return storeList;
+  } catch (e) {
+    throw new Error("Error");
+  }
+};
 
 //데이터구조
 /**
