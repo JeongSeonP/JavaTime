@@ -3,7 +3,7 @@ import Board from "../components/Board";
 import SearchBar from "../components/SearchBar";
 import { useEffect, useState } from "react";
 import SearchedStores from "../components/SearchedStores";
-import { getSearchedStoreInfo } from "../kakaoAPI";
+import { getSearchedStoreInfo } from "../api/kakaoAPI";
 import Modal from "../components/Modal";
 import cx from "clsx";
 
@@ -15,6 +15,7 @@ export interface StoreProps {
   x: string;
   y: string;
 }
+//이 페이지를 홈에서 팝업창으로 만들까봐
 
 const StoreSearch = () => {
   const [searchInput, setSearchInput] = useState("");
@@ -30,6 +31,7 @@ const StoreSearch = () => {
     h3: "선택된 카페가 없습니다. 카페를 선택해주세요.",
     p: "카페선택을 계속하시려면 확인버튼을 눌러주세요.",
     button: "확인",
+    secondButton: false,
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -97,8 +99,10 @@ const StoreSearch = () => {
     }
   };
 
-  const handleRedirect = () => {
-    setModal(false);
+  const handleRedirect = (answer: boolean) => {
+    if (answer) {
+      setModal(false);
+    }
   };
 
   useEffect(() => {
@@ -114,12 +118,16 @@ const StoreSearch = () => {
           <li className="step   before:scale-x-150 ml-3"></li>
         </ul>
         <Board title="카페 찾아보기">
-          <SearchBar
-            value={searchInput}
-            dispatchValue={setSearchInput}
-            handler={handleSubmit}
-            placeHolder="카페이름을 검색해보세요"
-          />
+          <div className="flex flex-col justify-center items-center">
+            <div className="relative">
+              <SearchBar
+                value={searchInput}
+                dispatchValue={setSearchInput}
+                handler={handleSubmit}
+                placeHolder="리뷰 작성할 카페이름을 검색해보세요"
+              />
+            </div>
+          </div>
           {noResult ? (
             <div className="mt-6">검색결과가 없습니다.</div>
           ) : (

@@ -11,7 +11,7 @@ const SearchBar = ({ value, dispatchValue, handler, placeHolder }: props) => {
   return (
     <form
       onSubmit={handler}
-      className="input-group flex justify-center relative"
+      className="input-group flex justify-center relative max-w-[400px] rounded-full shadow-sm"
     >
       <input
         type="text"
@@ -19,13 +19,13 @@ const SearchBar = ({ value, dispatchValue, handler, placeHolder }: props) => {
         onChange={(e) => dispatchValue(e.target.value)}
         placeholder={placeHolder}
         spellCheck={false}
-        className="input input-bordered w-[400px] bg-[#fff] placeholder:text-xs focus:outline-none"
+        className="input input-bordered  w-[300px] bg-[#fff] placeholder:text-xs focus:outline-none"
         autoFocus
       />
       <button
         type="button"
         onClick={() => dispatchValue("")}
-        className="w-4 h-4 border rounded-full text-xs text-neutral-400 flex justify-center items-center hover:bg-neutral-400 hover:text-base-100 absolute top-1/2 -translate-y-1/2 right-14 transition duration-200 ease-in-out"
+        className="w-3 h-3 border rounded-full text-xs text-neutral-400 flex justify-center items-center hover:bg-neutral-400 hover:text-base-100 absolute top-1/2 -translate-y-1/2 right-14 transition duration-200 ease-in-out"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

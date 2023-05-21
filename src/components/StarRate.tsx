@@ -5,8 +5,8 @@ interface Props {
 const StarRate = ({ rate }: Props) => {
   const starWidth = 16;
   return (
-    <div className="relative inline-block ml-1 w-[84px] h-[18px]">
-      <div className="absolute top-0 ">
+    <div className="relative ml-1 w-[84px] h-[18px] ">
+      <div className="absolute ">
         {Array(5)
           .fill(null)
           .map((_, i) => (

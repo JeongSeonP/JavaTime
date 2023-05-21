@@ -7,13 +7,13 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import { RecoilRoot } from "recoil";
 import MyPage from "./pages/MyPage";
-import StoreSelect from "./pages/StoreSelect";
 import StoreSearch from "./pages/StoreSearch";
 import CreateReview from "./pages/CreateReview";
 import CreateProfile from "./pages/CreateProfile";
 import { QueryClient, QueryClientProvider } from "react-query";
 import StorePage from "./pages/StorePage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ScrollToTop from "./components/ScrollToTop";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,15 +28,15 @@ const App = () => {
     <>
       <QueryClientProvider client={queryClient}>
         <RecoilRoot>
+          <ScrollToTop />
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/store/:storeId" element={<StorePage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/join" element={<Join />} />
+            <Route path="/store/:storeId" element={<StorePage />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/mypage" element={<MyPage />} />
-              <Route path="/storeselect" element={<StoreSelect />} />
               <Route path="/storesearch" element={<StoreSearch />} />
               <Route path="/review" element={<CreateReview />} />
               <Route path="/profile" element={<CreateProfile />} />

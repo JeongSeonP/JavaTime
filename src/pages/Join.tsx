@@ -1,10 +1,14 @@
-import { auth } from "../firebase";
+import { auth } from "../api/firebase";
 import { useEffect, useRef, useState } from "react";
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
+import {
+  useCreateUserWithEmailAndPassword,
+  useUpdateProfile,
+} from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
 import FormBoard from "../components/FormBoard";
 
 const Join = () => {
+  const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -13,8 +17,10 @@ const Join = () => {
   const navigate = useNavigate();
   const [createUserWithEmailAndPassword, user, loading, error] =
     useCreateUserWithEmailAndPassword(auth);
+  const [updateProfile, updating, profileError] = useUpdateProfile(auth);
 
-  //로그인, 조인 : 커스텀훅으로 해보기?
+  //로그인, 조인 : 커스텀훅으로 해보기? -이미 훅 사용중이라..
+  //react-hook-form으로 바꿔보기
   useEffect(() => {
     if (user) {
       setEmail("");
@@ -48,8 +54,10 @@ const Join = () => {
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     setErrorMsg("");
     e.preventDefault();
-    const res = await createUserWithEmailAndPassword(email, password);
-    return res;
+    await createUserWithEmailAndPassword(email, password);
+    if (displayName !== "") {
+      await updateProfile({ displayName });
+    }
   };
 
   return (
@@ -60,6 +68,23 @@ const Join = () => {
           submitBtn="가입하기"
           onSubmit={handleRegisterSubmit}
         >
+          <div className="flex justify-center items-center mb-2">
+            <label
+              htmlFor="registeredNickname"
+              className="block w-24 text-left font-semibold text-xs md:text-sm"
+            >
+              NICKNAME{" "}
+            </label>
+            <input
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              type="text"
+              id="registeredDisplayName"
+              name="displayName"
+              placeholder="displayName"
+              className="placeholder:text-sm input w-full max-w-xs input-bordered input-primary rounded-lg  "
+            />
+          </div>
           <div className="flex justify-center items-center mb-2">
             <label
               htmlFor="registeredEmail"
@@ -98,55 +123,6 @@ const Join = () => {
           </div>
           <p className="text-error text-right text-xs h-5">{errorMsg}</p>
         </FormBoard>
-        {/* <article className=" mx-auto w-[600px] p-10 text-center rounded-3xl border border-base-200 shadow">
-        <form onSubmit={handleRegisterSubmit}>
-          <fieldset className="text-neutral-600">
-            <legend className="flex justify-center items-center px-10 h-10  -translate-y-16 font-semibold rounded-full shadow bg-base-100">
-              회원가입
-            </legend>
-            <div className="flex justify-center items-center mb-2">
-              <label
-                htmlFor="registeredEmail"
-                className="block w-24 text-left font-semibold text-sm"
-              >
-                E-MAIL{" "}
-              </label>
-              <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                ref={emailRef}
-                type="email"
-                id="registeredEmail"
-                name="email"
-                placeholder="example@example.com"
-                className="placeholder:text-sm input w-full max-w-xs input-bordered input-primary rounded-lg  "
-              />
-            </div>
-            <div className="flex justify-center items-center mb-2">
-              <label
-                htmlFor="registeredPW"
-                className="block w-24 text-left font-semibold text-sm"
-              >
-                PASSWORD{" "}
-              </label>
-              <input
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                ref={passwordRef}
-                type="password"
-                name="password"
-                id="registeredPW"
-                placeholder="비밀번호는 6자 이상으로 만들어주세요."
-                className="placeholder:text-sm input w-full max-w-xs input-bordered input-primary rounded-lg "
-              />
-            </div>
-            <p className="text-error text-right text-xs h-5">{errorMsg}</p>
-            <button className="btn btn-wide rounded-full shadow-md no-animation my-8">
-              가입하기
-            </button>
-          </fieldset>
-        </form>
-      </article> */}
       </div>
     </main>
   );

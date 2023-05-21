@@ -2,15 +2,20 @@ import { useNavigate } from "react-router-dom";
 import FormBoard from "../components/FormBoard";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import ImageUploader from "../components/ImageUploader";
+import ImageUploader, { Imagefile } from "../components/ImageUploader";
 import Modal from "../components/Modal";
-import { getStation } from "../kakaoAPI";
-import { auth, setDocReview, setDocStore } from "../firebase";
+import { getStation } from "../api/kakaoAPI";
+import { auth, setDocReview, storage } from "../api/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useMutation, useQueryClient } from "react-query";
 import { Timestamp } from "firebase/firestore";
 import { flavorList, richnessList } from "../components/SelectOptions";
-import { queryClient } from "../App";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
 
 //이 페이지는 선택된 업체정보가 없으면 접근 못하게해야할듯.
 //리뷰작성 취소할때, 등록할때 모두 selectedstore도 초기화해야할듯.
@@ -25,11 +30,21 @@ export interface ReviewForm {
   text: string;
 }
 
+interface RevisionOption {
+  reviewID: string;
+  rating: string;
+  img: string | null;
+}
+
 const CreateReview = () => {
   const [modal, setModal] = useState(false);
-  // const [fileName, setFileName] = useState("");
+  const [existingReview, setExistingReview] = useState<RevisionOption | null>(
+    null
+  );
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [user] = useAuthState(auth);
+  const [imgFile, setImgFile] = useState<Imagefile | null>(null);
   const [store, setStore] = useState({
     id: "",
     phone: "",
@@ -54,13 +69,9 @@ const CreateReview = () => {
     },
   });
 
-  const { mutate: docMutate } = useMutation(setDocStore, {
+  const { mutate: reviewMutate, isLoading } = useMutation(setDocReview, {
     onSuccess: () => {
       queryClient.invalidateQueries(["storeInfo", store.id]);
-    },
-  });
-  const { mutate: reviewMutate } = useMutation(setDocReview, {
-    onSuccess: () => {
       queryClient.invalidateQueries(["reviewInfo", store.id]);
     },
   });
@@ -70,8 +81,13 @@ const CreateReview = () => {
     h3: "리뷰 남기실 카페를 먼저 선택해주세요.",
     p: "아래 버튼을 누르시면 카페 선택 페이지로 이동합니다.",
     button: "카페 선택하러 가기",
+    secondButton: false,
   };
 
+  //리뷰아이디를 useState로 관리해서 세션에 있으면 셋하고
+  //없을땐 createDoc에서 만든걸로 사용?
+  //state에따라 등록이냐 수정이냐로
+  //수정하러 들어왔다가 그냥 나갈때 세션부분 처리 필요
   useEffect(() => {
     const store = sessionStorage.getItem("selectedStore");
     if (store) {
@@ -79,23 +95,67 @@ const CreateReview = () => {
     } else if (store === null) {
       setModal(true);
     }
+
+    const isRevision = sessionStorage.getItem("revisionOption");
+    if (isRevision) {
+      setExistingReview(JSON.parse(isRevision));
+    }
+
+    return () => sessionStorage.clear();
   }, []);
+
+  useEffect(() => {
+    if (existingReview?.img) {
+      setImgFile({
+        file: null,
+        thumnail: existingReview.img,
+        name: "prevImg",
+      });
+    }
+  }, [existingReview]);
 
   const handleRedirect = () => {
     setModal(false);
-    navigate("/storeselect");
+    navigate("/storesearch");
   };
 
-  // console.log(Timestamp.fromDate(new Date()));
+  //수정중이라면 기존 사진url받아서 보여주기?
+  //imgFile이 스트링이면 url만있는거, 변경안하면 그대로 전달
+  // imgFile에 file자체가 있으면 그걸로 저장
+  //수정하면서 사진 지우면 스토리지에서도 삭제시켜야함
+  const updateImg = async (isUpload: boolean, reviewID: string) => {
+    const imageRef = ref(storage, `store/${store.id}/${reviewID}`);
+    try {
+      if (isUpload && imgFile?.file) {
+        await uploadBytes(imageRef, imgFile.file);
+      } else if (!isUpload) {
+        await deleteObject(imageRef);
+      }
+    } catch (e) {
+      throw new Error("error");
+    }
+  };
 
-  //지하철역 구한담에 이미지파일 처리, firestore올릴 데이터형식 만들고 setDoc하기
+  const getUrl = async (reviewID: string) => {
+    const imageRef = ref(storage, `store/${store.id}/${reviewID}`);
+    try {
+      const url = await getDownloadURL(imageRef);
+      return url;
+    } catch (e) {
+      throw new Error("error");
+    }
+  };
+
   const createDoc = async (formData: ReviewForm) => {
-    const createdDate = new Date().toLocaleString("en-US").split(",")[0];
+    const createdDate = new Date().toLocaleDateString("en-US");
     const { rating, flavor, richness, text } = formData;
     const { x, y, id, phone, storeName, address } = store;
     const stations: string[] = await getStation(x, y);
     const stationList = [...new Set(stations)];
-    const reviewID = `${id}_${Date.now()}`;
+    const prevRating = existingReview ? existingReview.rating : null;
+    const reviewID = existingReview
+      ? existingReview.reviewID
+      : `${id}_${Date.now()}`;
     const newDoc = {
       id: id,
       phone: phone,
@@ -105,6 +165,14 @@ const CreateReview = () => {
       y: y,
       stationList: stationList,
     };
+
+    if (imgFile?.file) {
+      await updateImg(true, reviewID);
+    } else if (!imgFile && existingReview) {
+      await updateImg(false, reviewID);
+    }
+    const url = imgFile ? await getUrl(reviewID) : null;
+
     const review = {
       reviewID: reviewID,
       date: createdDate,
@@ -117,19 +185,18 @@ const CreateReview = () => {
       richness: richness,
       text: text,
       rating: rating,
+      image: url,
+      comments: null,
     };
-    docMutate({ newDoc, rating });
-    reviewMutate({ id, reviewID, review });
-    // await setDocStore(newDoc);
-    // await setDocReview(id, reviewID, review);
+
+    // docMutate({ newDoc, rating });
+    reviewMutate({ prevRating, id, newDoc, reviewID, review });
     console.log("등록완료");
     sessionStorage.clear();
     navigate(`/store/${id}`, { replace: true });
   };
 
   const handleSubmit = (formData: ReviewForm) => {
-    console.log(isSubmitSuccessful);
-    console.log(formData);
     createDoc(formData);
   };
 
@@ -142,7 +209,7 @@ const CreateReview = () => {
         </ul>
         <FormBoard
           title="리뷰 작성하기"
-          submitBtn="리뷰 등록"
+          submitBtn={existingReview ? "리뷰 수정" : "리뷰 등록"}
           onSubmit={onSubmit(handleSubmit)}
         >
           <div className="flex justify-center items-center text-sm -mt-6">
@@ -170,38 +237,7 @@ const CreateReview = () => {
           <div className="max-w-[500px] mx-auto">
             <div className="flex items-center">
               <span>
-                <svg
-                  className=" w-9 h-9 inline-block px-2 "
-                  version="1.0"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 124.000000 120.000000"
-                  preserveAspectRatio="xMidYMid meet"
-                  fill="currentColor"
-                >
-                  <g
-                    transform="translate(0.000000,120.000000) scale(0.100000,-0.100000)"
-                    stroke="none"
-                  >
-                    <path
-                      d="M725 1186 c-59 -12 -176 -61 -225 -96 -14 -9 -37 -20 -51 -23 -14 -4
--43 -20 -65 -37 -21 -17 -48 -37 -59 -45 -52 -38 -165 -137 -165 -144 0 -4
--22 -44 -48 -88 -51 -84 -62 -109 -82 -183 -7 -25 -16 -55 -21 -68 -11 -29
--12 -199 -1 -206 5 -3 15 -31 22 -63 16 -71 26 -91 58 -121 26 -25 25 -25 150
--6 36 5 51 15 97 68 74 84 175 218 175 234 0 6 4 12 9 12 5 0 12 13 16 28 3
-16 19 43 35 61 16 17 49 62 73 99 49 75 93 122 113 122 8 0 14 4 14 9 0 9 134
-91 149 91 11 0 71 33 134 74 98 63 122 128 67 181 -16 16 -30 33 -30 38 0 6
--11 25 -26 44 l-25 33 -127 -1 c-70 -1 -154 -6 -187 -13z"
-                    />
-                    <path
-                      d="M1155 936 c-14 -14 -25 -30 -25 -36 0 -11 -53 -91 -77 -117 -6 -7
--42 -29 -80 -49 -77 -40 -151 -89 -204 -137 -20 -18 -49 -42 -64 -55 -40 -33
--115 -133 -115 -153 0 -18 -175 -198 -257 -267 -35 -28 -43 -41 -43 -68 0 -18
-5 -36 11 -40 19 -11 220 -7 232 5 6 6 21 11 34 11 12 0 51 9 85 19 35 11 82
-24 105 30 113 30 360 303 408 451 10 30 29 76 42 102 19 38 24 66 27 152 5
-132 -2 170 -32 174 -13 2 -32 -7 -47 -22z"
-                    />
-                  </g>
-                </svg>
+                <i className="ico-coffeeBean text-xl px-2"></i>
               </span>
               {Object.entries(flavorList).map(([value, description]) => (
                 <label
@@ -245,40 +281,7 @@ const CreateReview = () => {
             </div>
             <div className="flex items-center">
               <span>
-                <svg
-                  className=" w-9 h-9 inline-block px-2 "
-                  version="1.0"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="124.000000pt"
-                  height="120.000000pt"
-                  viewBox="0 0 124.000000 120.000000"
-                  preserveAspectRatio="xMidYMid meet"
-                  fill="currentColor"
-                >
-                  <g
-                    transform="translate(0.000000,120.000000) scale(0.100000,-0.100000)"
-                    stroke="none"
-                  >
-                    <path
-                      d="M725 1186 c-59 -12 -176 -61 -225 -96 -14 -9 -37 -20 -51 -23 -14 -4
--43 -20 -65 -37 -21 -17 -48 -37 -59 -45 -52 -38 -165 -137 -165 -144 0 -4
--22 -44 -48 -88 -51 -84 -62 -109 -82 -183 -7 -25 -16 -55 -21 -68 -11 -29
--12 -199 -1 -206 5 -3 15 -31 22 -63 16 -71 26 -91 58 -121 26 -25 25 -25 150
--6 36 5 51 15 97 68 74 84 175 218 175 234 0 6 4 12 9 12 5 0 12 13 16 28 3
-16 19 43 35 61 16 17 49 62 73 99 49 75 93 122 113 122 8 0 14 4 14 9 0 9 134
-91 149 91 11 0 71 33 134 74 98 63 122 128 67 181 -16 16 -30 33 -30 38 0 6
--11 25 -26 44 l-25 33 -127 -1 c-70 -1 -154 -6 -187 -13z"
-                    />
-                    <path
-                      d="M1155 936 c-14 -14 -25 -30 -25 -36 0 -11 -53 -91 -77 -117 -6 -7
--42 -29 -80 -49 -77 -40 -151 -89 -204 -137 -20 -18 -49 -42 -64 -55 -40 -33
--115 -133 -115 -153 0 -18 -175 -198 -257 -267 -35 -28 -43 -41 -43 -68 0 -18
-5 -36 11 -40 19 -11 220 -7 232 5 6 6 21 11 34 11 12 0 51 9 85 19 35 11 82
-24 105 30 113 30 360 303 408 451 10 30 29 76 42 102 19 38 24 66 27 152 5
-132 -2 170 -32 174 -13 2 -32 -7 -47 -22z"
-                    />
-                  </g>
-                </svg>
+                <i className="ico-coffeeBean text-xl px-2"></i>
               </span>
               {Object.entries(richnessList).map(([value, description]) => (
                 <label
@@ -363,7 +366,7 @@ const CreateReview = () => {
             사진을 첨부해주세요.{" "}
             <span className="text-xs font-normal">(선택 항목)</span>
           </div>
-          <ImageUploader />
+          <ImageUploader dispatch={setImgFile} img={imgFile} />
           <button
             role="button"
             onClick={() => reset()}

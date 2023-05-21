@@ -65,7 +65,7 @@ const KakaoMap = ({ info }: DocumentData) => {
       // storeMap.relayout();
       // storeMap.setLevel(5);
       storeMap.relayout();
-      console.log("storeMap", storeMap);
+      // console.log("storeMap", storeMap);
     }
   }, [storeMap, info]);
 

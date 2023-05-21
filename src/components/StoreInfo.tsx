@@ -2,50 +2,46 @@ import { DocumentData } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import KakaoMap from "./KakaoMap";
 import StarRate from "./StarRate";
+import { getDownloadURL, list, ref } from "firebase/storage";
+import { storage } from "../api/firebase";
 
-// interface ReviewInfo {
-//   reviewLength: number;
-//   averageRate: string;
-// }
 interface Props {
   info: DocumentData;
   map: boolean;
 }
 
 const StoreInfo = ({ info, map }: Props) => {
-  // const [mapOption, setMapOption] = useState({
-  //   x: 0,
-  //   y: 0,
-  //   name: "",
-  //   id: "",
-  // });
-  // const phoneNumber = `tel:${info.phone}`;
+  const [storeImage, setStoreImage] = useState<string | null>(null);
   const averageRate = (info.ttlRate / info.ttlParticipants)
     .toFixed(1)
     .toString();
 
-  // useEffect(() => {
-  //   if (map === false) return;
-  //   const { id, storeName, x, y } = info;
-  //   const option = {
-  //     x: Number(x),
-  //     y: Number(y),
-  //     name: storeName,
-  //     id: id,
-  //   };
-  //   setMapOption(option);
-  // }, [info, map]);
+  useEffect(() => {
+    const getUrl = async () => {
+      const listRef = ref(storage, `store/${info.id}`);
+      try {
+        const imgList = await list(listRef, { maxResults: 1 });
+        if (imgList) {
+          const url = await getDownloadURL(imgList.items[0]);
+          setStoreImage(url);
+        }
+      } catch (e) {
+        throw new Error("error");
+      }
+    };
+    getUrl();
+  }, [info]);
 
   return (
     <>
       <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-xl">
         <div className="flex items-center justify-start md:justify-between mb-2 w-[350px]">
           <div className="flex items-center justify-center w-[130px] h-[130px] md:w-[150px] md:h-[150px] bg-[#fff] mr-2 border border-neutral-300 rounded-xl overflow-hidden shrink-0">
-            <i className="ico-coffeeBean text-base-200 text-5xl"></i>
-            {/* <img
-              src="https://via.placeholder.com/150/fff"
-              alt="업체리뷰이미지"
-            /> */}
+            {storeImage ? (
+              <img src={storeImage} alt="리뷰이미지" />
+            ) : (
+              <i className="ico-coffeeBean text-base-200 text-5xl"></i>
+            )}
           </div>
 
           <div className="flex flex-col justify-between ml-1">

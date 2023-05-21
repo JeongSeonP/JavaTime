@@ -1,7 +1,8 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { auth } from "../firebase";
+import { auth } from "../api/firebase";
 import { useEffect, useRef, useState } from "react";
 import {
+  useAuthState,
   useSignInWithEmailAndPassword,
   useSignInWithGoogle,
 } from "react-firebase-hooks/auth";
@@ -22,6 +23,7 @@ const Login = () => {
 
   useEffect(() => {
     if (user || GGuser) {
+      localStorage.setItem("isLogin", "true");
       setEmail("");
       setPassword("");
       navigate(redirectedFrom);
@@ -79,29 +81,74 @@ const Login = () => {
     <main className="py-20">
       <article className="w-80 mx-auto text-center">
         <form onSubmit={handleLoginSubmit}>
-          <input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            ref={emailRef}
-            type="email"
-            name="email"
-            placeholder="E-MAIL"
-            className="placeholder:text-sm input w-full max-w-xs input-bordered input-primary rounded-[15px] mb-2 "
-          />
-          <input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            ref={passwordRef}
-            type="password"
-            name="password"
-            placeholder="PASSWORD"
-            className="placeholder:text-sm input w-full max-w-xs input-bordered input-primary rounded-[15px] mb-2 "
-          />
+          <div className="relative mb-2">
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              ref={emailRef}
+              type="email"
+              name="email"
+              placeholder="E-MAIL"
+              className="placeholder:text-xs input w-full max-w-xs input-bordered input-primary rounded-[15px]  "
+            />
+            <button
+              type="button"
+              onClick={() => setEmail("")}
+              className="w-3 h-3 border rounded-full text-xs text-neutral-400 flex justify-center items-center hover:bg-neutral-400 hover:text-base-100 absolute top-1/2 -translate-y-1/2 right-4 transition duration-200 ease-in-out"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+          <div className="relative mb-2">
+            <input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              ref={passwordRef}
+              type="password"
+              name="password"
+              placeholder="PASSWORD"
+              className="placeholder:text-xs input w-full max-w-xs input-bordered input-primary rounded-[15px]"
+            />
+            <button
+              type="button"
+              onClick={() => setPassword("")}
+              className="w-3 h-3 border rounded-full text-xs text-neutral-400 flex justify-center items-center hover:bg-neutral-400 hover:text-base-100 absolute top-1/2 -translate-y-1/2 right-4 transition duration-200 ease-in-out"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
           <p className="text-error text-right text-xs h-5">{errorMsg}</p>
           <button className="btn  bg-neutral/90 hover:bg-neutral text-neutral-content w-full rounded-full shadow-md no-animation my-2">
             로그인
           </button>
         </form>
+        <div className="divider my-1 text-xs">OR</div>
         <button
           onClick={handleGGLogin}
           className="btn  w-full rounded-full shadow-md no-animation my-2"
@@ -137,6 +184,14 @@ const Login = () => {
           </svg>
           구글 로그인
         </button>
+        <div className="text-right">
+          <button
+            onClick={() => navigate("/join")}
+            className="link link-primary mx-6 text-[13px] text-primary-dark-color"
+          >
+            회원가입
+          </button>
+        </div>
       </article>
     </main>
   );

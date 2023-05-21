@@ -7,3 +7,13 @@ export const richnessList = {
   bland: "커피맛이 싱거워요",
   bitter: "커피맛이 써요",
 };
+
+export const favoriteFlavor = {
+  sour: "산미있는 원두",
+  nutty: "고소한 원두",
+};
+export const favoriteType = {
+  americano: "아메리카노",
+  cafelatte: "카페라떼",
+  drip: "드립커피",
+};

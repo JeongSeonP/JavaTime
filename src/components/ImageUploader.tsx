@@ -1,27 +1,29 @@
-import { useRef, useState } from "react";
-import { Control, UseFormRegister, Controller } from "react-hook-form";
-import { ReviewForm } from "../pages/CreateReview";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
+import { ref } from "firebase/storage";
+import { useUploadFile } from "react-firebase-hooks/storage";
+import { storage } from "../api/firebase";
 
-interface Imagefile {
-  file: File;
+export interface Imagefile {
+  file: File | null;
   thumnail: string;
   name: string;
 }
 
-const ImageUploader = () => {
-  const [imgFile, setImgFile] = useState<Imagefile | null>(null);
-  // const imgRef = useRef<HTMLInputElement>(null);
+interface Props {
+  dispatch: Dispatch<SetStateAction<Imagefile | null>>;
+  img: Imagefile | null;
+}
 
+const ImageUploader = ({ dispatch, img }: Props) => {
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
     if (fileList && fileList[0]) {
       const url = URL.createObjectURL(fileList[0]);
-      setImgFile({
+      dispatch({
         file: fileList[0],
         thumnail: url,
         name: fileList[0].name,
       });
-      console.log(fileList[0]);
     }
   };
 
@@ -47,12 +49,8 @@ const ImageUploader = () => {
           <p>찾아보기</p>
         </label>
         <div className="w-36 h-36 flex justify-center items-center rounded-r-lg shadow bg-[#fff] overflow-hidden relative">
-          {imgFile ? (
-            <img
-              src={imgFile.thumnail}
-              alt={imgFile.name}
-              className="inline-block"
-            />
+          {img ? (
+            <img src={img.thumnail} alt={img.name} className="inline-block" />
           ) : (
             <div className="text-xs font-thin text-neutral-400">
               <p>선택된 사진이</p>
@@ -60,7 +58,8 @@ const ImageUploader = () => {
             </div>
           )}
           <button
-            onClick={() => setImgFile(null)}
+            type="button"
+            onClick={() => dispatch(null)}
             className="w-5 h-5 border rounded-full text-primary flex justify-center items-center bg-[#fff] hover:bg-primary hover:text-base-100 absolute top-1 right-1"
           >
             <svg
