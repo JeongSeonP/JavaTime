@@ -7,6 +7,7 @@ import { favoriteFlavor, favoriteType } from "../components/SelectOptions";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { auth, setDocUser, storage } from "../api/firebase";
 import { useAuthState, useUpdateProfile } from "react-firebase-hooks/auth";
+import { useMutation, useQueryClient } from "react-query";
 
 interface ProfileForm {
   displayName: string;
@@ -18,8 +19,14 @@ interface ProfileForm {
 const CreateProfile = () => {
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [imgFile, setImgFile] = useState<Imagefile | null>(null);
   const [updateProfile, updating, profileError] = useUpdateProfile(auth);
+  const { mutate: userMutate, isLoading } = useMutation(setDocUser, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["user", user?.uid]);
+    },
+  });
   const {
     register,
     formState: { errors, isSubmitSuccessful },
@@ -38,7 +45,7 @@ const CreateProfile = () => {
   const isPublic = watch("isPublic");
 
   const getUrl = async (uid: string | undefined) => {
-    if (!imgFile) return;
+    if (!imgFile || !imgFile.file) return;
     const imageRef = ref(storage, `user/${uid}`);
     try {
       const res = await uploadBytes(imageRef, imgFile.file);
@@ -58,7 +65,8 @@ const CreateProfile = () => {
       favoriteType: type,
       isPublic: isPublic,
     };
-    await setDocUser({ uid, userDoc });
+    userMutate({ uid, userDoc });
+    // await setDocUser({ uid, userDoc });
     if (imgFile) {
       const photoURL = await getUrl(uid);
       await updateProfile({ displayName, photoURL });
@@ -85,6 +93,7 @@ const CreateProfile = () => {
               type="text"
               id="nickname"
               maxLength={10}
+              spellCheck={false}
               placeholder="닉네임은 10자 이내로 지어주세요."
               className="placeholder:text-xs input w-3/5 max-w-xs input-bordered input-primary bg-[#fff] rounded-xl "
               {...register("displayName", {

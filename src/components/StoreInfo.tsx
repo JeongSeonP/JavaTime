@@ -26,7 +26,7 @@ const StoreInfo = ({ info, map }: Props) => {
           setStoreImage(url);
         }
       } catch (e) {
-        throw new Error("error");
+        console.log(e);
       }
     };
     getUrl();

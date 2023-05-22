@@ -24,6 +24,7 @@ import Modal from "../components/Modal";
 import CommentInput from "../components/CommentInput";
 import Dropdown from "../components/Dropdown";
 import Comments from "../components/Comments";
+import ProfileModal from "../components/ProfileModal";
 
 export interface ReviewDocumentData extends DocumentData {
   reviewList: ReviewDocData[];
@@ -115,15 +116,14 @@ const StorePage = () => {
     navigate("/review");
   };
 
-  const handleRevision = (
-    reviewID: string,
-    rating: string,
-    img: string | null
-  ) => {
+  const handleRevision = (review: ReviewDocData) => {
     const revisionOption = {
-      reviewID: reviewID,
-      rating: rating,
-      img: img,
+      reviewID: review.reviewID,
+      rating: review.rating,
+      img: review.image,
+      flavor: review.flavor,
+      richness: review.richness,
+      text: review.text,
     };
     sessionStorage.setItem("revisionOption", JSON.stringify(revisionOption));
     goToReview();
@@ -174,9 +174,8 @@ const StorePage = () => {
                 className="w-full text-right border-2 border-base-200 rounded-xl bg-[#fff] my-2 p-3"
               >
                 <div className="flex justify-between items-center mb-1.5">
-                  <div className="text-[#744959] font-semibold indent-2">
-                    {review.user.displayName ?? review.user.email}
-                  </div>
+                  <ProfileModal user={review.user} />
+
                   <div className="flex justify-end items-center">
                     <span className="flex items-center my-1 font-semibold text-sm text-secondary-content">
                       {review.rating}
@@ -186,13 +185,7 @@ const StorePage = () => {
                       <Dropdown>
                         <li>
                           <div
-                            onClick={() =>
-                              handleRevision(
-                                review.reviewID,
-                                review.rating,
-                                review.image
-                              )
-                            }
+                            onClick={() => handleRevision(review)}
                             className="text-xs pl-2"
                           >
                             <svg
@@ -250,8 +243,13 @@ const StorePage = () => {
                   ) : null}
                   <p>{review.text}</p>
 
-                  <div className="italic rounded-xl bg-[#d3e5e5] px-2 shadow text-right mt-1">
-                    date: {review.date}
+                  <div className="flex justify-end items-center italic rounded-xl bg-[#d3e5e5] px-2 shadow mt-1">
+                    {review.isRevised ? (
+                      <p className="mr-1 text-neutral-400 text-[10px]">
+                        (편집됨)
+                      </p>
+                    ) : null}
+                    <p>date: {review.date}</p>
                   </div>
                 </div>
 
@@ -270,9 +268,10 @@ const StorePage = () => {
 
                 <CommentInput
                   info={{ storeId: storeDoc.id, reviewId: review.reviewID }}
-                  commentId={null}
+                  prevComment={null}
                   inputEditor={null}
                 />
+                {/* <ProfileModal /> */}
               </li>
             ))
           )}

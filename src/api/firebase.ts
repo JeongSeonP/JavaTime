@@ -28,6 +28,7 @@ import {
 import { DeleteOption, ReviewDocumentData } from "../pages/StorePage";
 import { favoriteFlavor, favoriteType } from "../components/SelectOptions";
 import { UserDocumentData } from "../pages/MyPage";
+import { StoreDocumentData } from "../components/Table";
 
 // import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -73,6 +74,7 @@ interface ReviewDoc {
     email: string | null | undefined;
     displayName: string | null | undefined;
     uid: string | undefined;
+    photo: string | null | undefined;
   };
   flavor: string;
   richness: string;
@@ -80,6 +82,7 @@ interface ReviewDoc {
   rating: string;
   image: string | null;
   comments: CommentProp[] | null;
+  isRevised: boolean;
 }
 export interface ReviewDocData {
   reviewID: string;
@@ -88,6 +91,7 @@ export interface ReviewDocData {
     email: string;
     displayName: string | null;
     uid: string;
+    photo: string | null | undefined;
   };
   flavor: "sour" | "nutty";
   richness: "rich" | "bland" | "bitter";
@@ -95,6 +99,7 @@ export interface ReviewDocData {
   rating: string;
   image: string | null;
   comments: CommentProp[] | null;
+  isRevised: boolean;
 }
 
 interface ReviewDocProp {
@@ -105,11 +110,11 @@ interface ReviewDocProp {
   review: ReviewDoc;
 }
 
-interface DeleteCommentProp {
-  storeId: string;
-  reviewID: string;
-  commentId: number;
-}
+// interface DeleteCommentProp {
+//   storeId: string;
+//   reviewID: string;
+//   commentId: number;
+// }
 
 export interface UpdateCommentProp {
   newDoc: CommentProp | null;
@@ -169,13 +174,22 @@ export const setDocReview = async ({
         ttlRate: increment(Number(review.rating)),
         ttlParticipants: increment(1),
       });
+
       await setDoc(reviewRef, review, { merge: true });
     } else {
       const updatedRating = Number(review.rating) - Number(prevRating);
       await updateDoc(storeRef, {
         ttlRate: increment(updatedRating),
       });
-      await setDoc(reviewRef, review, { merge: true });
+      // await setDoc(reviewRef, review, { merge: true });
+      await updateDoc(reviewRef, {
+        flavor: review.flavor,
+        richness: review.richness,
+        text: review.text,
+        rating: review.rating,
+        image: review.image,
+        isRevised: review.isRevised,
+      });
     }
   } catch (e) {
     throw new Error("Error");
@@ -354,6 +368,23 @@ export const getDocStore = async (id: string | undefined) => {
     if (docSnap.exists()) {
       return docSnap.data();
     }
+  } catch (e) {
+    throw new Error("Error");
+  }
+};
+
+export const getMostPopularStores = async () => {
+  const q = query(
+    collection(db, "stores"),
+    orderBy("ttlParticipants", "desc"),
+    limit(6)
+  );
+  try {
+    const docSnap = await getDocs(q);
+    const storeList = docSnap.docs.map((doc) =>
+      doc.data()
+    ) as StoreDocumentData[];
+    return storeList;
   } catch (e) {
     throw new Error("Error");
   }

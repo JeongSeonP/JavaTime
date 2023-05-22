@@ -33,6 +33,9 @@ export interface ReviewForm {
 interface RevisionOption {
   reviewID: string;
   rating: string;
+  flavor: "sour" | "nutty";
+  richness: "rich" | "bland" | "bitter";
+  text: string;
   img: string | null;
 }
 
@@ -71,7 +74,7 @@ const CreateReview = () => {
 
   const { mutate: reviewMutate, isLoading } = useMutation(setDocReview, {
     onSuccess: () => {
-      queryClient.invalidateQueries(["storeInfo", store.id]);
+      queryClient.invalidateQueries(["storeInfo"]);
       queryClient.invalidateQueries(["reviewInfo", store.id]);
     },
   });
@@ -105,6 +108,15 @@ const CreateReview = () => {
   }, []);
 
   useEffect(() => {
+    if (existingReview) {
+      reset({
+        rating: existingReview.rating,
+        flavor: existingReview.flavor,
+        richness: existingReview.richness,
+        text: existingReview.text,
+      });
+    }
+
     if (existingReview?.img) {
       setImgFile({
         file: null,
@@ -126,9 +138,11 @@ const CreateReview = () => {
   const updateImg = async (isUpload: boolean, reviewID: string) => {
     const imageRef = ref(storage, `store/${store.id}/${reviewID}`);
     try {
-      if (isUpload && imgFile?.file) {
-        await uploadBytes(imageRef, imgFile.file);
-      } else if (!isUpload) {
+      if (isUpload) {
+        if (imgFile?.file) {
+          await uploadBytes(imageRef, imgFile.file);
+        }
+      } else {
         await deleteObject(imageRef);
       }
     } catch (e) {
@@ -153,9 +167,18 @@ const CreateReview = () => {
     const stations: string[] = await getStation(x, y);
     const stationList = [...new Set(stations)];
     const prevRating = existingReview ? existingReview.rating : null;
+    const isRevised = existingReview ? true : false;
     const reviewID = existingReview
       ? existingReview.reviewID
       : `${id}_${Date.now()}`;
+
+    if (imgFile) {
+      await updateImg(true, reviewID);
+    } else if (!imgFile && existingReview?.img) {
+      await updateImg(false, reviewID);
+    }
+    const url = imgFile ? await getUrl(reviewID) : null;
+
     const newDoc = {
       id: id,
       phone: phone,
@@ -166,13 +189,6 @@ const CreateReview = () => {
       stationList: stationList,
     };
 
-    if (imgFile?.file) {
-      await updateImg(true, reviewID);
-    } else if (!imgFile && existingReview) {
-      await updateImg(false, reviewID);
-    }
-    const url = imgFile ? await getUrl(reviewID) : null;
-
     const review = {
       reviewID: reviewID,
       date: createdDate,
@@ -180,6 +196,7 @@ const CreateReview = () => {
         email: user?.email,
         displayName: user?.displayName,
         uid: user?.uid,
+        photo: user?.photoURL,
       },
       flavor: flavor,
       richness: richness,
@@ -187,6 +204,7 @@ const CreateReview = () => {
       rating: rating,
       image: url,
       comments: null,
+      isRevised: isRevised,
     };
 
     // docMutate({ newDoc, rating });
@@ -221,16 +239,17 @@ const CreateReview = () => {
           <div className="flex justify-center items-center my-4 text-secondary-content text-sm font-semibold">
             <div className="inline-block  mr-2 ">평점 선택</div>
             <div className="rating flex items-center">
-              {Array.from({ length: 6 }, (v, i) => (v = i)).map((rate) => (
-                <input
-                  key={rate}
-                  type="radio"
-                  className="mask mask-star-2 bg-accent first:hidden"
-                  value={String(rate)}
-                  defaultChecked={rate === 0 ? true : false}
-                  {...register("rating", { required: true })}
-                />
-              ))}
+              {Array.from({ length: 6 }, (v, i) => (v = String(i))).map(
+                (rate) => (
+                  <input
+                    key={rate}
+                    type="radio"
+                    className="mask mask-star-2 bg-accent first:hidden"
+                    value={String(rate)}
+                    {...register("rating", { required: true })}
+                  />
+                )
+              )}
               <span className="ml-2">{rate}</span>
             </div>
           </div>

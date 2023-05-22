@@ -7,10 +7,13 @@ import {
   updateComment,
 } from "../api/firebase";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 interface Props {
-  commentId: number | null;
+  prevComment: {
+    commentId: number;
+    text: string;
+  } | null;
   info: {
     storeId: string;
     reviewId: string;
@@ -22,7 +25,7 @@ interface CommentsForm {
   comment: string;
 }
 
-const CommentInput = ({ commentId, info, inputEditor }: Props) => {
+const CommentInput = ({ prevComment, info, inputEditor }: Props) => {
   const [user] = useAuthState(auth);
   const queryClient = useQueryClient();
   const {
@@ -43,8 +46,16 @@ const CommentInput = ({ commentId, info, inputEditor }: Props) => {
     },
   });
 
+  useEffect(() => {
+    if (prevComment) {
+      reset({
+        comment: prevComment.text,
+      });
+    }
+  }, []);
+
   const handleSubmit = (formData: CommentsForm) => {
-    if (commentId) {
+    if (prevComment) {
       updateCommentDoc(formData);
     } else {
       createCommentDoc(formData);
@@ -81,12 +92,13 @@ const CommentInput = ({ commentId, info, inputEditor }: Props) => {
   };
 
   const updateCommentDoc = (formData: CommentsForm) => {
+    if (!prevComment) return;
     const { comment } = formData;
     const document: UpdateCommentProp = {
       newDoc: null,
       storeId: info.storeId,
       reviewId: info.reviewId,
-      commentId: commentId,
+      commentId: prevComment.commentId,
       newText: comment,
     };
     commentMutate(document);
@@ -102,15 +114,26 @@ const CommentInput = ({ commentId, info, inputEditor }: Props) => {
           <div className="flex justify-between my-0.5">
             <input
               type="text"
-              placeholder={commentId ? "" : "댓글 쓰기"}
+              placeholder={prevComment ? "" : "댓글 쓰기"}
               className="input input-bordered input-xs w-full focus:outline-none"
               maxLength={150}
+              spellCheck={false}
+              autoFocus={prevComment ? true : false}
               {...register("comment", {
                 required: true,
               })}
             />
+            {inputEditor ? (
+              <button
+                onClick={() => inputEditor(false)}
+                type="button"
+                className="btn btn-xs btn-ghost font-normal text-[11px] bg-base-200 hover:bg-base-300"
+              >
+                취소
+              </button>
+            ) : null}
             <button className="btn btn-xs btn-ghost font-normal text-[11px] bg-base-200 hover:bg-base-300">
-              {commentId ? "수정" : "등록"}
+              {prevComment ? "수정" : "등록"}
             </button>
           </div>
         </form>

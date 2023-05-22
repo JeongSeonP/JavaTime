@@ -1,12 +1,13 @@
 import { useAuthState, useSignOut } from "react-firebase-hooks/auth";
 import { auth } from "../api/firebase";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import cx from "clsx";
 import { ReactHTMLElement, ReactNode } from "react";
 
 const MyMenu = () => {
   const [isLogin] = useAuthState(auth);
   const [signOut, loading, error] = useSignOut(auth);
+  const navigate = useNavigate();
   const isOnline = !!isLogin;
 
   const handleSignOut = async () => {
@@ -15,6 +16,7 @@ const MyMenu = () => {
     if (error) {
       throw new Error("로그아웃실패");
     }
+    navigate("/login");
   };
 
   const handleFocus = () => {
@@ -52,7 +54,7 @@ const MyMenu = () => {
         <ul
           onClick={handleFocus}
           tabIndex={0}
-          className="mt-3 px-1 py-2.5 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-28 "
+          className="mt-3 px-1 py-2.5 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-28"
         >
           {isLogin ? (
             <>
@@ -73,10 +75,38 @@ const MyMenu = () => {
           ) : (
             <>
               <li>
-                <Link to={"/login"}>로그인</Link>
+                <Link to={"/login"} className="font-semibold text-xs px-4">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    className="w-1/4 text-[#7a6287]"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                    <path
+                      fillRule="evenodd"
+                      d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"
+                    />
+                  </svg>
+                  <span className="">로그인</span>
+                </Link>
               </li>
               <li>
-                <Link to={"/join"}>회원가입</Link>
+                <Link to={"/join"} className="font-semibold text-xs px-3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    className="w-1/4 text-[#7a6287]"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7Zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216ZM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+                  </svg>
+                  <span className="shrink-0 ">회원가입</span>
+                </Link>
               </li>
             </>
           )}

@@ -13,7 +13,7 @@ const Dropdown = (props: Props) => {
   };
 
   return (
-    <div className="dropdown dropdown-end ml-2">
+    <div className="dropdown dropdown-end ml-1">
       <label tabIndex={0} className="btn btn-ghost btn-xs btn-circle avatar">
         <button className="btn btn-square btn-ghost border border-base-300 btn-xs ">
           <svg

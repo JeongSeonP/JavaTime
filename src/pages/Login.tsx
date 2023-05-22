@@ -91,26 +91,28 @@ const Login = () => {
               placeholder="E-MAIL"
               className="placeholder:text-xs input w-full max-w-xs input-bordered input-primary rounded-[15px]  "
             />
-            <button
-              type="button"
-              onClick={() => setEmail("")}
-              className="w-3 h-3 border rounded-full text-xs text-neutral-400 flex justify-center items-center hover:bg-neutral-400 hover:text-base-100 absolute top-1/2 -translate-y-1/2 right-4 transition duration-200 ease-in-out"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+            {email === "" ? null : (
+              <button
+                type="button"
+                onClick={() => setEmail("")}
+                className="w-3 h-3 border rounded-full text-xs flex justify-center items-center bg-neutral-400 text-base-100 absolute top-1/2 -translate-y-1/2 right-4"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            )}
           </div>
           <div className="relative mb-2">
             <input
@@ -122,26 +124,28 @@ const Login = () => {
               placeholder="PASSWORD"
               className="placeholder:text-xs input w-full max-w-xs input-bordered input-primary rounded-[15px]"
             />
-            <button
-              type="button"
-              onClick={() => setPassword("")}
-              className="w-3 h-3 border rounded-full text-xs text-neutral-400 flex justify-center items-center hover:bg-neutral-400 hover:text-base-100 absolute top-1/2 -translate-y-1/2 right-4 transition duration-200 ease-in-out"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+            {password === "" ? null : (
+              <button
+                type="button"
+                onClick={() => setPassword("")}
+                className="w-3 h-3 border rounded-full text-xs flex justify-center items-center bg-neutral-400 text-base-100 absolute top-1/2 -translate-y-1/2 right-4"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            )}
           </div>
           <p className="text-error text-right text-xs h-5">{errorMsg}</p>
           <button className="btn  bg-neutral/90 hover:bg-neutral text-neutral-content w-full rounded-full shadow-md no-animation my-2">

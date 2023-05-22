@@ -51,7 +51,7 @@ const StorePageSearch = () => {
   return (
     <>
       <div className="flex flex-col justify-center items-center">
-        <div className="text-xs mb-4 p-3 px-8 bg-[#fff] rounded-full font-semibold text-[#a08973] shadow-md shadow-base-200">
+        {/* <div className="text-xs mb-4 p-3 px-8 bg-[#fff] rounded-full font-semibold text-[#a08973] shadow-md shadow-base-200">
           <p>커피에 진심이신가요?</p>
           <p className="flex items-center h-6">
             <i className="ico-coffeeBean inline-block mt-0.5 mr-0.5"></i>
@@ -59,7 +59,7 @@ const StorePageSearch = () => {
               Java Time에서 커피리뷰를 공유해보세요!
             </span>
           </p>
-        </div>
+        </div> */}
         <div className="relative">
           <SearchBar
             value={searchInput}
@@ -69,7 +69,7 @@ const StorePageSearch = () => {
           />
           <ul
             className={cx(
-              "absolute p-2 md:w-[500px] min-w-[400px] min-h-[140px] rounded-2xl shadow-md shadow-base-300 bg-base-200  mt-2",
+              "absolute z-[9999] p-2 md:w-[500px] min-w-[400px] min-h-[140px] rounded-2xl shadow-md shadow-base-300 bg-base-200  mt-2",
               { ["hidden"]: !resultModal }
             )}
           >

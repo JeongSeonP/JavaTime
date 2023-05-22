@@ -81,8 +81,9 @@ const Join = () => {
               type="text"
               id="registeredDisplayName"
               name="displayName"
-              placeholder="displayName"
-              className="placeholder:text-sm input w-full max-w-xs input-bordered input-primary rounded-lg  "
+              maxLength={10}
+              placeholder="닉네임은 10자 이내로 지어주세요."
+              className="placeholder:text-xs input w-full max-w-xs input-bordered input-primary rounded-lg  "
             />
           </div>
           <div className="flex justify-center items-center mb-2">
@@ -100,7 +101,7 @@ const Join = () => {
               id="registeredEmail"
               name="email"
               placeholder="example@example.com"
-              className="placeholder:text-sm input w-full max-w-xs input-bordered input-primary rounded-lg  "
+              className="placeholder:text-xs input w-full max-w-xs input-bordered input-primary rounded-lg  "
             />
           </div>
           <div className="flex justify-center items-center mb-2">
@@ -118,7 +119,7 @@ const Join = () => {
               name="password"
               id="registeredPW"
               placeholder="비밀번호는 6자 이상으로 만들어주세요."
-              className="placeholder:text-sm input w-full max-w-xs input-bordered input-primary rounded-lg "
+              className="placeholder:text-xs input w-full max-w-xs input-bordered input-primary rounded-lg "
             />
           </div>
           <p className="text-error text-right text-xs h-5">{errorMsg}</p>

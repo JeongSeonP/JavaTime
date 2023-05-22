@@ -27,7 +27,7 @@ const Comments = ({ storeId, reviewId, comment }: Prop) => {
     },
   });
 
-  const handleRevision = (commentId: number) => {
+  const handleReviseComment = () => {
     setEditMode(true);
   };
 
@@ -46,7 +46,7 @@ const Comments = ({ storeId, reviewId, comment }: Prop) => {
   return (
     <li
       key={comment.commentId}
-      className="text-right px-2 py-0 md:indent-3 bg-[#faf5f0] rounded-xl shadow-sm my-1"
+      className="text-right px-2 py-0  bg-[#faf5f0] rounded-xl shadow-sm my-1"
     >
       <div className="flex justify-between items-center  pl-2 rounded-xl text-[11px] text-neutral-500">
         <span className="inline-block">
@@ -63,7 +63,7 @@ const Comments = ({ storeId, reviewId, comment }: Prop) => {
             <Dropdown>
               <li>
                 <div
-                  onClick={() => handleRevision(comment.commentId)}
+                  onClick={() => handleReviseComment()}
                   className="text-xs w-14 shrink-0"
                 >
                   수정
@@ -83,7 +83,7 @@ const Comments = ({ storeId, reviewId, comment }: Prop) => {
       </div>
       {editMode ? (
         <CommentInput
-          commentId={comment.commentId}
+          prevComment={{ commentId: comment.commentId, text: comment.text }}
           info={{ storeId: storeId, reviewId: reviewId }}
           inputEditor={setEditMode}
         />
