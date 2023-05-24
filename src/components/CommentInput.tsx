@@ -6,8 +6,8 @@ import {
   auth,
   updateComment,
 } from "../api/firebase";
-import { useMutation, useQuery, useQueryClient } from "react-query";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "react-query";
+import { Dispatch, SetStateAction, useEffect } from "react";
 
 interface Props {
   prevComment: {

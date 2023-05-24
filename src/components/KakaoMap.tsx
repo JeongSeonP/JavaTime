@@ -1,5 +1,5 @@
 import { DocumentData } from "firebase/firestore";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 declare global {
   interface Window {
     kakao: any;
@@ -9,8 +9,7 @@ declare global {
 const KakaoMap = ({ info }: DocumentData) => {
   const container = useRef(null);
   const overlayContainer = useRef(null);
-  const [storeMap, setStoreMap] = useState<any>(null);
-  //const [position, setPosition] = useState<any>(null);
+  // const [storeMap, setStoreMap] = useState<any>(null);
   const KAKAO_JAVASCRIPT_KEY = import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY;
   const href = `http://place.map.kakao.com/${info.id}`;
 
@@ -23,7 +22,6 @@ const KakaoMap = ({ info }: DocumentData) => {
       window.kakao.maps.load(() => {
         const kakaoMap = window.kakao.maps;
         const position = new kakaoMap.LatLng(Number(info.y), Number(info.x));
-        //setPosition(position);
         const options = {
           center: position,
           level: 5,
@@ -52,27 +50,23 @@ const KakaoMap = ({ info }: DocumentData) => {
           content: overlayContainer.current,
           yAnchor: 1.5,
         });
-        setStoreMap(map);
+        // setStoreMap(map);
         //map.relayout();
       });
     };
     return () => script.remove();
   }, [container, info]);
 
-  useEffect(() => {
-    if (storeMap) {
-      // storeMap.setCenter(position);
-      // storeMap.setLevel(4);
-      // storeMap.relayout();
-      // storeMap.setLevel(5);
-      storeMap.relayout();
-    }
-  }, [storeMap, info]);
+  // useEffect(() => {
+  //   if (storeMap) {
+  //     storeMap.relayout();
+  //   }
+  // }, [storeMap, info]);
 
   return (
     <div className="rounded-xl shadow-md overflow-hidden mb-2">
       <div ref={overlayContainer} className="relative inline-block z-[999]">
-        <div className="flex items-center text-base-100 w-fit py-1 px-3 h-5 rounded-md bg-[#291334] hover:bg-[#532c66]  text-xs  after:content-['']  after:absolute after:left-[50%] after:rotate-45 after:-translate-x-2/4 after:-bottom-1 after:w-2 after:h-2 after:border-b-4 after:border-r-4 after:border-[#291334] shadow-[1px_2px_2px_0px_#fff] after:shadow-[1px_1px_1px_0px_#fff]">
+        <div className="flex items-center text-base-100 w-fit py-1 px-3 h-5 rounded-md bg-[#291334] hover:text-[#dfaff7] transition-transform duration-100 ease-in-out  text-xs  after:content-['']  after:absolute after:left-[50%] after:rotate-45 after:-translate-x-2/4 after:-bottom-1 after:w-2 after:h-2 after:border-b-4 after:border-r-4 after:border-[#291334] shadow-[1px_2px_2px_0px_#fff] after:shadow-[1px_1px_1px_0px_#fff]">
           <a
             href={href}
             className=" "

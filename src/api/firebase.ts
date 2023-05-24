@@ -1,7 +1,7 @@
 import axios from "axios";
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getStorage } from "firebase/storage";
+import { getDownloadURL, getStorage, list, ref } from "firebase/storage";
 import {
   QuerySnapshot,
   addDoc,
@@ -25,8 +25,13 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
-import { DeleteOption, ReviewDocumentData } from "../pages/StorePage";
-import { favoriteFlavor, favoriteType } from "../components/SelectOptions";
+import { DeleteOption, ReviewDocumentData } from "../components/Review";
+import {
+  FlavorCode,
+  RichnessCode,
+  favoriteFlavor,
+  favoriteType,
+} from "../components/SelectOptions";
 import { UserDocumentData } from "../pages/MyPage";
 import { StoreDocumentData } from "../components/Table";
 
@@ -93,8 +98,8 @@ export interface ReviewDocData {
     uid: string;
     photo: string | null | undefined;
   };
-  flavor: "sour" | "nutty";
-  richness: "rich" | "bland" | "bitter";
+  flavor: FlavorCode;
+  richness: RichnessCode;
   text: string;
   rating: string;
   image: string | null;
@@ -288,19 +293,29 @@ export const updateComment = async ({
 
 export const getReviewList = async (
   id: string | undefined,
-  pageParam: number | string
+  pageParam: number | string,
+  filter: boolean,
+  sort: string
 ) => {
   if (id === undefined || pageParam === null) return;
   const perPage = 5;
+  const sortBy = sort === "최신순" ? "date" : "rating";
 
   if (pageParam === 0) {
     try {
-      const q = query(
+      const qAll = query(
         collection(db, "stores", id, "review"),
-        orderBy("date", "desc"),
+        orderBy(sortBy, "desc"),
         limit(perPage + 1)
       );
-      const snapShot = await getDocs(q);
+      const qPhoto = query(
+        collection(db, "stores", id, "review"),
+        where("image", "!=", null),
+        orderBy("image", "desc"),
+        limit(perPage + 1)
+      );
+      const selectedQ = filter ? qPhoto : qAll;
+      const snapShot = await getDocs(selectedQ);
       const reviewList = snapShot.docs.map((doc) =>
         doc.data()
       ) as ReviewDocData[];
@@ -318,6 +333,7 @@ export const getReviewList = async (
 
       return result;
     } catch (e) {
+      console.log(e);
       throw new Error("Error");
     }
   } else if (pageParam !== 0) {
@@ -326,13 +342,22 @@ export const getReviewList = async (
       const startAfterSnap = await getDoc(startAfterRef);
 
       if (startAfterSnap.exists()) {
-        const nextQ = query(
+        const nextQAll = query(
           collection(db, "stores", id, "review"),
-          orderBy("date", "desc"),
+          orderBy(sortBy, "desc"),
           startAfter(startAfterSnap),
           limit(perPage + 1)
         );
-        const nextSnapShot = await getDocs(nextQ);
+
+        const nextQPhoto = query(
+          collection(db, "stores", id, "review"),
+          where("image", "!=", null),
+          orderBy("image", "desc"),
+          startAfter(startAfterSnap),
+          limit(perPage + 1)
+        );
+        const selectedQ = filter ? nextQPhoto : nextQAll;
+        const nextSnapShot = await getDocs(selectedQ);
         const reviewList = nextSnapShot.docs.map((doc) =>
           doc.data()
         ) as ReviewDocData[];
@@ -366,7 +391,7 @@ export const getDocStore = async (id: string | undefined) => {
   try {
     const docSnap = await getDoc(storeRef);
     if (docSnap.exists()) {
-      return docSnap.data();
+      return docSnap.data() as StoreDocumentData;
     }
   } catch (e) {
     throw new Error("Error");
@@ -386,6 +411,7 @@ export const getMostPopularStores = async () => {
     ) as StoreDocumentData[];
     return storeList;
   } catch (e) {
+    console.log("e", e);
     throw new Error("Error");
   }
 };
@@ -393,13 +419,15 @@ export const getMostPopularStores = async () => {
 export const findStoreByName = async (storeName: string) => {
   const q = query(
     collection(db, "stores"),
-    where("storeName", "==", storeName)
+    where("storeName", "==", storeName),
+    orderBy("ttlParticipants", "desc")
   );
   try {
     const docSnap = await getDocs(q);
     const storeList = docSnap.docs.map((doc) => doc.data());
     return storeList;
   } catch (e) {
+    console.log(e);
     throw new Error("Error");
   }
 };
@@ -411,13 +439,15 @@ export const findStoreByStation = async (station: string) => {
   }
   const q = query(
     collection(db, "stores"),
-    where("stationList", "array-contains", station)
+    where("stationList", "array-contains", station),
+    orderBy("ttlParticipants", "desc")
   );
   try {
     const docSnap = await getDocs(q);
     const storeList = docSnap.docs.map((doc) => doc.data());
     return storeList;
   } catch (e) {
+    console.log(e);
     throw new Error("Error");
   }
 };
@@ -453,6 +483,29 @@ export const getDocUser = async (uid: string | undefined) => {
     }
   } catch (e) {
     throw new Error("Error");
+  }
+};
+
+export const getUrl = async (refPath: string) => {
+  const imageRef = ref(storage, refPath);
+  try {
+    const url = await getDownloadURL(imageRef);
+    return url;
+  } catch (e) {
+    throw new Error("error");
+  }
+};
+
+export const getThumbnailUrl = async (refPath: string) => {
+  const listRef = ref(storage, refPath);
+  try {
+    const imgList = await list(listRef, { maxResults: 1 });
+    if (imgList.items.length === 0) return;
+
+    const url = await getDownloadURL(imgList.items[0]);
+    return url;
+  } catch (e) {
+    console.log(e);
   }
 };
 

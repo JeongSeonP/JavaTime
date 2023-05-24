@@ -4,12 +4,18 @@ import { auth, getDocUser } from "../api/firebase";
 import { useEffect, useState } from "react";
 import { DocumentData } from "firebase/firestore";
 import { useQuery } from "react-query";
-import { favoriteFlavor, favoriteType } from "../components/SelectOptions";
+import {
+  FlavorCode,
+  TypeCode,
+  favoriteFlavor,
+  favoriteType,
+} from "../components/SelectOptions";
 import { useNavigate } from "react-router-dom";
+import { BsCheckCircleFill, BsFillPersonFill } from "react-icons/Bs";
 
 export interface UserDocumentData extends DocumentData {
-  favoriteFlavor: "sour" | "nutty";
-  favoriteType: "americano" | "cafelatte" | "drip";
+  favoriteFlavor: FlavorCode;
+  favoriteType: TypeCode;
   isPublic: boolean;
 }
 
@@ -19,7 +25,6 @@ const MyPage = () => {
   const { data: userDoc } = useQuery(["user", user?.uid], () =>
     getDocUser(user?.uid)
   );
-
   return (
     <main className="pt-10 pb-20">
       <div className="mx-auto text-center font-semibold text-sm">
@@ -40,14 +45,7 @@ const MyPage = () => {
                   alt="프로필이미지"
                 />
               ) : (
-                <svg
-                  className="w-40 mt-2"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 16 16"
-                >
-                  <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-                </svg>
+                <BsFillPersonFill size="160" className="mt-2" />
               )}
             </div>
             {userDoc ? (
@@ -58,31 +56,13 @@ const MyPage = () => {
                   </p>
                   <div className="flex justify-center items-center p-4 text-center">
                     <div className="flex justify-center items-center mr-7">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        className="bi bi-check-circle-fill text-primary mr-2"
-                        viewBox="0 0 16 16"
-                      >
-                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-                      </svg>
+                      <BsCheckCircleFill className="text-primary mr-2" />
                       <p className="font-normal">
                         {favoriteFlavor[userDoc.favoriteFlavor]}
                       </p>
                     </div>
                     <div className="flex justify-center items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        className="bi bi-check-circle-fill text-primary mr-2"
-                        viewBox="0 0 16 16"
-                      >
-                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-                      </svg>
+                      <BsCheckCircleFill className="text-primary mr-2" />
                       <p className="font-normal">
                         {favoriteType[userDoc.favoriteType]}
                       </p>
@@ -95,16 +75,7 @@ const MyPage = () => {
                     <i className="ico-coffeeBean mr-1"></i>프로필 공개여부
                   </p>
                   <div className="flex justify-center items-center p-4 ">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-check-circle-fill text-primary mr-2"
-                      viewBox="0 0 16 16"
-                    >
-                      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-                    </svg>
+                    <BsCheckCircleFill className="text-primary mr-2" />
                     <p className="font-normal">
                       {userDoc.isPublic ? "공개" : "비공개"}
                     </p>

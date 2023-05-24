@@ -16,6 +16,7 @@
     "react-dom": "^18.0.0-rc.3",
     "react-firebase-hooks": "^5.1.1",
     "react-hook-form": "^7.43.9",
+    "react-icons": "^4.8.0",
     "react-query": "^3.39.3",
     "react-router-dom": "^6.10.0",
     "recoil": "^0.7.7"

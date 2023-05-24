@@ -11,7 +11,7 @@ interface ModalProps {
   };
 }
 
-const Modal = ({ toggle, handleRedirect, option }: ModalProps) => {
+const ConfirmModal = ({ toggle, handleRedirect, option }: ModalProps) => {
   return (
     <div
       className={cx("modal z-[99999]", {
@@ -36,4 +36,4 @@ const Modal = ({ toggle, handleRedirect, option }: ModalProps) => {
   );
 };
 
-export default Modal;
+export default ConfirmModal;

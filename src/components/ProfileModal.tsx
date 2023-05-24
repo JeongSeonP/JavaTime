@@ -1,8 +1,9 @@
 import { useQuery } from "react-query";
 import { getDocUser } from "../api/firebase";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import cx from "clsx";
 import { favoriteFlavor, favoriteType } from "./SelectOptions";
+import { BsCheckCircleFill } from "react-icons/Bs";
 
 interface UserData {
   email: string;
@@ -67,31 +68,13 @@ const ProfileModal = ({ user }: Props) => {
               </p>
               <div className="flex justify-center items-center p-4 text-center">
                 <div className="flex justify-center items-center mr-7">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    className="bi bi-check-circle-fill text-[#fff] mr-2"
-                    viewBox="0 0 16 16"
-                  >
-                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-                  </svg>
+                  <BsCheckCircleFill className="text-[#fff] mr-2" />
                   <p className="font-normal">
                     {favoriteFlavor[userDoc.favoriteFlavor]}
                   </p>
                 </div>
                 <div className="flex justify-center items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    className="bi bi-check-circle-fill text-[#fff] mr-2"
-                    viewBox="0 0 16 16"
-                  >
-                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-                  </svg>
+                  <BsCheckCircleFill className="text-[#fff] mr-2" />
                   <p className="font-normal">
                     {favoriteType[userDoc.favoriteType]}
                   </p>
@@ -99,7 +82,7 @@ const ProfileModal = ({ user }: Props) => {
               </div>
             </div>
           ) : (
-            <p className="py-4 text-sm">프로필이 공개되지 않았습니다.</p>
+            <p className="mt-4 py-4 text-sm">프로필이 공개되지 않았습니다.</p>
           )}
         </div>
       </div>

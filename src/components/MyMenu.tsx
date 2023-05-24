@@ -2,7 +2,7 @@ import { useAuthState, useSignOut } from "react-firebase-hooks/auth";
 import { auth } from "../api/firebase";
 import { Link, useNavigate } from "react-router-dom";
 import cx from "clsx";
-import { ReactHTMLElement, ReactNode } from "react";
+import { BsFillPersonFill } from "react-icons/Bs";
 
 const MyMenu = () => {
   const [isLogin] = useAuthState(auth);
@@ -27,7 +27,7 @@ const MyMenu = () => {
   };
 
   return (
-    <div className="w-12 ">
+    <div className="md:w-16 ">
       <div tabIndex={0} className=" dropdown dropdown-end ">
         <label
           className={cx(
@@ -40,14 +40,7 @@ const MyMenu = () => {
             {isLogin?.photoURL ? (
               <img src={isLogin.photoURL} alt="프로필이미지" />
             ) : (
-              <svg
-                className="w-14 mt-1"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 22 22"
-              >
-                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-              </svg>
+              <BsFillPersonFill size="40" className="mt-1" />
             )}
           </div>
         </label>
@@ -75,36 +68,12 @@ const MyMenu = () => {
           ) : (
             <>
               <li>
-                <Link to={"/login"} className="font-semibold text-xs px-4">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    className="w-1/4 text-[#7a6287]"
-                    viewBox="0 0 16 16"
-                  >
-                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-                    <path
-                      fillRule="evenodd"
-                      d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"
-                    />
-                  </svg>
+                <Link to={"/login"} className="font-semibold text-xs ">
                   <span className="">로그인</span>
                 </Link>
               </li>
               <li>
-                <Link to={"/join"} className="font-semibold text-xs px-3">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    className="w-1/4 text-[#7a6287]"
-                    viewBox="0 0 16 16"
-                  >
-                    <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7Zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216ZM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
-                  </svg>
+                <Link to={"/join"} className="font-semibold text-xs ">
                   <span className="shrink-0 ">회원가입</span>
                 </Link>
               </li>

@@ -1,7 +1,4 @@
-import { Dispatch, SetStateAction, useRef, useState } from "react";
-import { ref } from "firebase/storage";
-import { useUploadFile } from "react-firebase-hooks/storage";
-import { storage } from "../api/firebase";
+import { Dispatch, SetStateAction } from "react";
 
 export interface Imagefile {
   file: File | null;
@@ -48,7 +45,7 @@ const ImageUploader = ({ dispatch, img }: Props) => {
           </div>
           <p>찾아보기</p>
         </label>
-        <div className="w-36 h-36 flex justify-center items-center rounded-r-lg shadow bg-[#fff] overflow-hidden relative">
+        <div className="w-36 h-36 z-[888] flex justify-center items-center rounded-r-lg shadow bg-[#fff] overflow-hidden relative">
           {img ? (
             <img src={img.thumnail} alt={img.name} className="inline-block" />
           ) : (

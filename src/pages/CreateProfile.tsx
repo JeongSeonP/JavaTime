@@ -66,10 +66,12 @@ const CreateProfile = () => {
       isPublic: isPublic,
     };
     userMutate({ uid, userDoc });
-    // await setDocUser({ uid, userDoc });
+
     if (imgFile) {
       const photoURL = await getUrl(uid);
       await updateProfile({ displayName, photoURL });
+    } else {
+      await updateProfile({ displayName, photoURL: "" });
     }
     navigate("/mypage");
   };

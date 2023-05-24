@@ -1,6 +1,3 @@
-import { useSetRecoilState } from "recoil";
-import { selectedStore } from "../StoreAtom";
-
 interface StoreProps {
   id: string;
   place_name: string;
@@ -13,20 +10,19 @@ interface Props {
   dispatchID: (selectedID: string) => void;
 }
 
-//hover시 li 바탕색 바뀌게 하기
 const SearchedStores = ({ storeList, dispatchID }: Props) => {
   return (
-    <ul className="max-w-lg py-3 mx-auto">
+    <ul className="py-3 px-1 mx-auto bg-base-200 z-[9999] w-[350px]">
       {storeList.length > 0
         ? storeList.map((store) => (
             <li
               key={store.id}
-              className="flex justify-start items-center  p-2 hover:bg-[#fff] rounded-full transition duration-300 ease-in-out"
+              className="flex justify-start items-center z-[9999]  p-2 hover:bg-base-100 rounded-xl transition duration-300 ease-in-out"
             >
               <input
                 type="radio"
                 name="radio-store"
-                className="radio radio-primary"
+                className="radio hidden"
                 id={store.id}
                 required
                 onChange={(e) => dispatchID(e.target.id)}
@@ -47,13 +43,13 @@ const SearchedStores = ({ storeList, dispatchID }: Props) => {
                       {store.phone}
                     </p>
                   </div>
-                  <p className="text-left text-xs my-1 hover:bg-base-300 bg-base-200 p-1 rounded-full">
+                  <p className="text-left text-xs my-1 hover:bg-base-300 bg-base-100 p-1 rounded-full">
                     <a
                       target="_blank"
                       rel="noopener noreferrer"
                       href={`http://place.map.kakao.com/${store.id}`}
                     >
-                      업체 상세정보
+                      업체정보
                     </a>
                   </p>
                 </div>
