@@ -16,14 +16,14 @@ const Header = () => {
 
   return (
     <header className="h-24 p-5 bg-base-200 fixed top-0 left-0 right-0 z-[9999] shadow">
-      <div className="w-full md:w-4/5 mx-auto flex justify-between items-center">
-        <h1 className="sm:w-52 w-10 text-2xl  text-center ">
+      <div className="w-full lg:w-4/6 mx-auto flex justify-between items-center">
+        <h1 className="sm:w-40 w-10 text-2xl">
           <Link
             to={"/"}
             className="flex justify-start sm:justify-center items-center"
           >
             <i className="ico-coffeeBean inline-block px-2 md:text-2xl text-3xl "></i>
-            <span className="sr-only sm:not-sr-only">JAVA TIME</span>
+            <span className="sr-only md:not-sr-only">JAVA TIME</span>
           </Link>
         </h1>
         <div className="flex justify-center items-center">

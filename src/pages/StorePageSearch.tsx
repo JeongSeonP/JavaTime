@@ -1,21 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { findStoreByName, findStoreByStation } from "../api/firebase";
 import { DocumentData } from "firebase/firestore";
 import StoreInfo from "../components/StoreInfo";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import cx from "clsx";
 import { useRecoilState } from "recoil";
 import { searchedInput } from "../SearchInputAtom";
-import SearchReview from "../components/InputDispatch";
 import SearchInput from "../components/SearchInput";
+import { CgSpinner } from "react-icons/Cg";
 
-//다른데 위치한 검색창에서 검색어 입력하면
-//여기에 서치인풋 이니셜값으로
-// 리코일으로..? 서치바는 단순하게 값만 리코일에 전달하는역할로바꿔서?
 const StorePageSearch = () => {
-  // const [searchInput, setSearchInput] = useState("");
   const [noResult, setNoResult] = useState(false);
-  // const [resultModal, setResultModal] = useState(false);
   const [count, setCount] = useState(0);
   const [searchedList, setSearchedLIst] = useState<DocumentData[] | null>(null);
   const [page, setPage] = useState<DocumentData[] | null>(null);
@@ -26,7 +21,7 @@ const StorePageSearch = () => {
   useEffect(() => {
     if (searchInput !== "") {
       setNoResult(false);
-      setSearchedLIst([]);
+      setSearchedLIst(null);
       getResult();
       setIsLoading(true);
     }
@@ -36,13 +31,16 @@ const StorePageSearch = () => {
   useEffect(() => {
     if (searchInput === "") {
       setNoResult(false);
+      setPage(null);
+      setCount(0);
     }
   }, [searchInput]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setCount(0);
     setNoResult(false);
-    setSearchedLIst([]);
+    setPage(null);
     getResult();
     setIsLoading(true);
   };
@@ -66,6 +64,7 @@ const StorePageSearch = () => {
       setPage(pages[0]);
     } else {
       setNoResult(true);
+      setSearchedLIst([]);
     }
     setIsLoading(false);
   };
@@ -99,7 +98,9 @@ const StorePageSearch = () => {
           </div>
           <ul className=" flex flex-col items-center md:w-full max-w-xl w-[350px] rounded-2xl mt-2 p-2">
             {isLoading ? (
-              <button className="btn btn-ghost mt-10 bg-base-200 text-[#fff] btn-square loading"></button>
+              <div className="animate-spin mt-4">
+                <CgSpinner className="ico-coffeeBean text-neutral-content text-4xl" />
+              </div>
             ) : null}
             {noResult ? (
               <li className="h-[100px] w-full flex items-center rounded-2xl">

@@ -18,7 +18,6 @@ const SearchInput = ({ value, dispatchValue, placeHolder }: props) => {
         placeholder={placeHolder}
         spellCheck={false}
         className="input input-bordered border-none w-full bg-[#fff] placeholder:text-xs focus:outline-none"
-        autoFocus
       />
       {value === "" ? null : (
         <button

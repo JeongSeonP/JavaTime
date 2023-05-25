@@ -1,6 +1,8 @@
+import Topbtn from "./TopBtn";
+
 const Footer = () => {
   return (
-    <footer className="footer footer-center p-10 bg-base-200/80 text-base-content rounded">
+    <footer className="footer footer-center relative p-10 bg-base-200/80 text-base-content rounded">
       <div className="grid grid-flow-col gap-4">
         <a className="link link-hover">About us</a>
         <a className="link link-hover">Contact</a>
@@ -57,6 +59,7 @@ const Footer = () => {
       <div>
         <p>Copyright © 2023 - All right reserved by Java Time Ltd</p>
       </div>
+      <Topbtn />
     </footer>
   );
 };

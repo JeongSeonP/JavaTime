@@ -153,9 +153,8 @@ const Review = ({ storeDoc }: Props) => {
         onClick={goToReview}
         className="btn md:w-full max-w-xl w-[350px] mb-1"
       >
-        리뷰 등록하기
+        리뷰 쓰기
       </button>
-
       <div className="flex justify-between items-center px-2">
         <div className="flex items-center">
           {sortList.map((sortItem) => (

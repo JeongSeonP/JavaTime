@@ -1,27 +1,22 @@
 import { Route, Routes } from "react-router-dom";
+import { RecoilRoot } from "recoil";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { Suspense, lazy } from "react";
 import "./App.css";
 import Header from "./components/Header";
 import Home from "./pages/Home";
 import Footer from "./components/Footer";
-import { RecoilRoot } from "recoil";
-import CreateProfile from "./pages/CreateProfile";
-import { QueryClient, QueryClientProvider } from "react-query";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
-import StorePageSearch from "./pages/StorePageSearch";
-import { Suspense, lazy } from "react";
 import Loading from "./components/Loading";
-// import Join from "./pages/Join";
-// import Login from "./pages/Login";
-// import MyPage from "./pages/MyPage";
-// import CreateReview from "./pages/CreateReview";
-// import StorePage from "./pages/StorePage";
 
 const Login = lazy(() => import("./pages/Login"));
 const Join = lazy(() => import("./pages/Join"));
 const MyPage = lazy(() => import("./pages/MyPage"));
 const StorePage = lazy(() => import("./pages/StorePage"));
 const CreateReview = lazy(() => import("./pages/CreateReview"));
+const CreateProfile = lazy(() => import("./pages/CreateProfile"));
+const StorePageSearch = lazy(() => import("./pages/StorePageSearch"));
 
 export const queryClient = new QueryClient({
   defaultOptions: {

@@ -32,7 +32,6 @@ const CreateProfile = () => {
     formState: { errors, isSubmitSuccessful },
     handleSubmit: onSubmit,
     watch,
-    reset,
   } = useForm<ProfileForm>({
     mode: "onSubmit",
     defaultValues: {
@@ -65,6 +64,7 @@ const CreateProfile = () => {
       favoriteType: type,
       isPublic: isPublic,
     };
+
     userMutate({ uid, userDoc });
 
     if (imgFile) {
@@ -166,9 +166,7 @@ const CreateProfile = () => {
                 type="checkbox"
                 className="toggle toggle-primary"
                 defaultChecked
-                {...register("isPublic", {
-                  required: true,
-                })}
+                {...register("isPublic")}
               />
             </label>
           </div>

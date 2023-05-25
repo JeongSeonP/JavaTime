@@ -5,6 +5,7 @@ import { getDownloadURL, list, ref } from "firebase/storage";
 import { DocumentData } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import TableItem from "./TableItem";
+import TableLoading from "./TableLoading";
 
 export interface StoreDocumentData extends DocumentData {
   id: string;
@@ -24,6 +25,10 @@ const Table = () => {
     isLoading,
     error,
   } = useQuery(["storeInfo"], getMostPopularStores);
+
+  if (isLoading) {
+    return <TableLoading />;
+  }
 
   return (
     <>

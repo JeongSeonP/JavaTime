@@ -23,6 +23,7 @@ const Join = () => {
   //react-hook-form으로 바꿔보기
   useEffect(() => {
     if (user) {
+      localStorage.setItem("isLogin", "true");
       setEmail("");
       setPassword("");
       navigate("/");
@@ -61,7 +62,7 @@ const Join = () => {
   };
 
   return (
-    <main className="py-20">
+    <main className="py-20 pb-20">
       <div className=" mx-auto text-center ">
         <FormBoard
           title="회원가입"

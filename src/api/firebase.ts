@@ -1,10 +1,11 @@
-import axios from "axios";
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getDownloadURL, getStorage, list, ref } from "firebase/storage";
+import { DeleteOption, ReviewDocumentData } from "../components/Review";
+import { FlavorCode, RichnessCode } from "../components/SelectOptions";
+import { UserDocumentData } from "../pages/MyPage";
+import { StoreDocumentData } from "../components/Table";
 import {
-  QuerySnapshot,
-  addDoc,
   doc,
   setDoc,
   getDoc,
@@ -12,11 +13,8 @@ import {
   getDocs,
   getFirestore,
   query,
-  serverTimestamp,
-  DocumentData,
   where,
   orderBy,
-  startAt,
   limit,
   startAfter,
   updateDoc,
@@ -25,22 +23,7 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
-import { DeleteOption, ReviewDocumentData } from "../components/Review";
-import {
-  FlavorCode,
-  RichnessCode,
-  favoriteFlavor,
-  favoriteType,
-} from "../components/SelectOptions";
-import { UserDocumentData } from "../pages/MyPage";
-import { StoreDocumentData } from "../components/Table";
 
-// import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FB_API_KEY,
   authDomain: import.meta.env.VITE_FB_AUTH_DOMAIN,
@@ -141,28 +124,6 @@ export interface CommentProp {
   isRevised: boolean;
 }
 
-// export interface CommentDocProp {
-//   storeId: string;
-//   reviewId: string;
-//   comment: CommentProp;
-// }
-
-// export const setDocStore = async ({ newDoc, rating }: StoreDocProp) => {
-//   const id = newDoc.id;
-//   const storeRef = doc(db, "stores", id);
-//   try {
-//     await setDoc(storeRef, newDoc, { merge: true });
-//     await updateDoc(storeRef, {
-//       ttlRate: increment(Number(rating)),
-//       ttlParticipants: increment(1),
-//     });
-//   } catch (e) {
-//     throw new Error("Error");
-//   }
-// };
-
-//리뷰수정일경우 분기처리
-//처음등록일경우도 storeupdate여기안에
 export const setDocReview = async ({
   prevRating,
   id,
@@ -186,7 +147,6 @@ export const setDocReview = async ({
       await updateDoc(storeRef, {
         ttlRate: increment(updatedRating),
       });
-      // await setDoc(reviewRef, review, { merge: true });
       await updateDoc(reviewRef, {
         flavor: review.flavor,
         richness: review.richness,
@@ -218,18 +178,6 @@ export const deleteReview = async ({
     throw new Error("Error");
   }
 };
-
-// export const setDocComment = async (commentDoc: CommentDocProp) => {
-//   const { storeId, reviewId, comment } = commentDoc;
-//   const commentRef = doc(db, "stores", storeId, "review", reviewId);
-//   try {
-//     await updateDoc(commentRef, {
-//       comments: arrayUnion(comment),
-//     });
-//   } catch (e) {
-//     throw new Error("Error");
-//   }
-// };
 
 export const updateComment = async ({
   newDoc,
@@ -267,29 +215,6 @@ export const updateComment = async ({
     throw new Error("Error");
   }
 };
-// revise랑 delete을 분기처리해서 한개 함수로 합치자...
-// export const deleteComment = async ({
-//   storeId,
-//   reviewID,
-//   commentId,
-// }: DeleteCommentProp) => {
-//   const commentRef = doc(db, "stores", storeId, "review", reviewID);
-
-//   try {
-//     const docSnap = await getDoc(commentRef);
-//     if (docSnap.exists()) {
-//       const comment = docSnap.data().comments;
-//       const target = comment.find(
-//         (item: CommentProp) => item.commentId === commentId
-//       );
-//       await updateDoc(commentRef, {
-//         comments: arrayRemove(target),
-//       });
-//     }
-//   } catch (e) {
-//     throw new Error("Error");
-//   }
-// };
 
 export const getReviewList = async (
   id: string | undefined,
@@ -376,7 +301,6 @@ export const getReviewList = async (
           nextPage: nextPage,
           hasNextPage: hasNextPage,
         };
-
         return result;
       }
     } catch (e) {
