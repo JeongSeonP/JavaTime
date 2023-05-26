@@ -1,12 +1,6 @@
 import axios from "axios";
-import { useEffect } from "react";
-import { useQuery } from "react-query";
 
-//카카오 로컬 테스트
-//리뷰 작성시 기존 데이터 없을때 카카오통해서 업체 검색 -> x,y값기준 근처 지하철역검색결과를 포함한 데이터 생성해서 firestore에 저장
-//리뷰 검색할때 지하철역 기준으로도 검색 할 수 있도록.
-
-const KAKAO_REST_API_KEY = "6141e6d9b8577c45a9f067edf98ffea3";
+const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
 
 interface documents {
   place_name: string;
@@ -32,7 +26,7 @@ export const getSearchedStoreInfo = async (storeName: string, page: string) => {
     `https://dapi.kakao.com/v2/local/search/keyword.json?category_group_code=CE7&query=${storeName}&page=${page}&size=5`,
     {
       headers: {
-        Authorization: `KakaoAK ${import.meta.env.VITE_KAKAO_REST_API_KEY}`,
+        Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
       },
     }
   );
@@ -42,7 +36,3 @@ export const getSearchedStoreInfo = async (storeName: string, page: string) => {
 
   return [placeInfo, isEnd];
 };
-
-// export const useStore = (storeName: string, page: string) => {
-//   return useQuery(["storeInfo"], () => getSearchedStoreInfo(storeName, page));
-// };

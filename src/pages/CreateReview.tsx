@@ -297,7 +297,7 @@ const CreateReview = () => {
                 })}
               />
               <div className="w-full h-4 max-w-lg">
-                {errors?.text ? (
+                {errors?.text?.message ? (
                   <div className="flex justify-end pt-1 items-center text-error">
                     <FiAlertCircle className="mr-1" />
                     <p className="inline-block  text-right text-xs">

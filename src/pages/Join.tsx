@@ -19,8 +19,6 @@ const Join = () => {
     useCreateUserWithEmailAndPassword(auth);
   const [updateProfile, updating, profileError] = useUpdateProfile(auth);
 
-  //로그인, 조인 : 커스텀훅으로 해보기? -이미 훅 사용중이라..
-  //react-hook-form으로 바꿔보기
   useEffect(() => {
     if (user) {
       localStorage.setItem("isLogin", "true");
@@ -29,7 +27,6 @@ const Join = () => {
       navigate("/");
     }
     if (error) {
-      console.log(error);
       switch (error.code) {
         case "auth/email-already-in-use":
           setErrorMsg("이미 가입된 email주소입니다.");
@@ -84,7 +81,7 @@ const Join = () => {
               name="displayName"
               maxLength={10}
               placeholder="닉네임은 10자 이내로 지어주세요."
-              className="placeholder:text-xs input w-full max-w-xs input-bordered input-primary rounded-lg  "
+              className="placeholder:text-xs bg-[#fff] input w-full max-w-xs input-bordered input-primary rounded-lg  "
             />
           </div>
           <div className="flex justify-center items-center mb-2">
@@ -102,7 +99,7 @@ const Join = () => {
               id="registeredEmail"
               name="email"
               placeholder="example@example.com"
-              className="placeholder:text-xs input w-full max-w-xs input-bordered input-primary rounded-lg  "
+              className="placeholder:text-xs bg-[#fff] input w-full max-w-xs input-bordered input-primary rounded-lg  "
             />
           </div>
           <div className="flex justify-center items-center mb-2">
@@ -120,7 +117,7 @@ const Join = () => {
               name="password"
               id="registeredPW"
               placeholder="비밀번호는 6자 이상으로 만들어주세요."
-              className="placeholder:text-xs input w-full max-w-xs input-bordered input-primary rounded-lg "
+              className="placeholder:text-xs bg-[#fff] input w-full max-w-xs input-bordered input-primary rounded-lg "
             />
           </div>
           <p className="text-error text-right text-xs h-5">{errorMsg}</p>

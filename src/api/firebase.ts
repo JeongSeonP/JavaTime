@@ -50,11 +50,6 @@ export interface StoreDoc {
   y: string;
 }
 
-// interface StoreDocProp {
-//   newDoc: StoreDoc;
-//   rating: string;
-// }
-
 interface ReviewDoc {
   reviewID: string;
   date: string;
@@ -97,12 +92,6 @@ interface ReviewDocProp {
   reviewID: string;
   review: ReviewDoc;
 }
-
-// interface DeleteCommentProp {
-//   storeId: string;
-//   reviewID: string;
-//   commentId: number;
-// }
 
 export interface UpdateCommentProp {
   newDoc: CommentProp | null;

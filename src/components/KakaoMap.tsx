@@ -9,13 +9,11 @@ declare global {
 const KakaoMap = ({ info }: DocumentData) => {
   const container = useRef(null);
   const overlayContainer = useRef(null);
-  // const [storeMap, setStoreMap] = useState<any>(null);
   const KAKAO_JAVASCRIPT_KEY = import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY;
   const href = `http://place.map.kakao.com/${info.id}`;
 
   useEffect(() => {
     const script = document.createElement("script");
-    script.className = "kakaoScript";
     script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JAVASCRIPT_KEY}&autoload=false`;
     document.head.appendChild(script);
     script.onload = () => {

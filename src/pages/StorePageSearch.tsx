@@ -121,7 +121,7 @@ const StorePageSearch = () => {
           {count > 0 ? (
             <button
               onClick={handlePage}
-              className="btn btn-ghost w-3/4 sm:w-1/2 bg-base-200 hover:bg-base-300"
+              className="btn btn-ghost w-3/4 sm:w-1/3 bg-base-200 hover:bg-base-300"
             >
               더보기
             </button>
